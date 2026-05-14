@@ -1023,7 +1023,7 @@ function App() {
     const p=cfg.provider||'mistral';
     return ce('div',null,
       ce('div',{className:'card'},
-        ce('div',{className:'ch'},'🤖 Fournisseur d\'IA'},
+        ce('div',{className:'ch'},'🤖 IA & Modèle'},
         ce('div',{className:'col'},
           ce('select',{className:'inp sel',defaultValue:p,onChange:ev=>sc(prev=>Object.assign({},prev,{provider:ev.target.value}))},
             Object.entries(AI_PROV).map(([k,v])=>ce('option',{key:k,value:k},v.label))
@@ -1079,7 +1079,7 @@ function App() {
           ce('span',{className:'xt gt'},'La Plume Rouge v'+VER),
           ce('span',{className:'xt gt'},'Hébergement : GitHub Pages · Données : localStorage navigateur'),
           ce('span',{className:'xt gt'},'Phase 1 (test) — Migration Supabase + Auth prévue pour le lancement SaaS'),
-          ce('span',{className:'xt gt'},'La Plume Rouge est un outil créé par Alain Burgun, enseignant à l'École Vauban Luxembourg (AEFE), à partir d'une idée née en classe en 2025.')
+          ce('span',{className:'xt gt'},'La Plume Rouge est un outil créé par Alain Burgun, enseignant à l’École Vauban Luxembourg (AEFE), à partir d’une idée née en classe en 2025.')
         )
       )
     );
