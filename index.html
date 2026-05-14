@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>La Plume Rouge · par Alain Burgun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@babel/standalone@7.23.0/babel.min.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>
+:root{--cream:#F5F2EC;--paper:#FDFCF9;--ink:#1A1A2E;--blue:#1A3C6E;--bl:#E6EDF7;--bdr:#DDD8CE;--gray:#6B7280;--gray2:#9CA3AF;--sc:#C05621;--sb:#FFF8F3;--lc:#6D28D9;--lb:#F5F3FF;--ac:#1D4ED8;--ab:#EFF6FF;--hc:#047857;--hb:#ECFDF5;--pc:#B91C1C;--pb:#FEF2F2;--shad:0 2px 8px rgba(26,60,110,.07);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;-webkit-text-size-adjust:100%;}
+.app{max-width:920px;margin:0 auto;padding:0 14px 80px;}
+.hdr{padding:16px 0 12px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--bdr);}
+.hic{width:43px;height:43px;background:var(--blue);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.hdr h1{font-size:1.1rem;font-weight:800;color:var(--blue);line-height:1.2;}
+.hsub{font-size:.7rem;color:var(--gray);}
+.hv{margin-left:auto;font-size:.68rem;color:var(--gray2);font-family:'JetBrains Mono';background:white;padding:3px 8px;border-radius:20px;border:1px solid var(--bdr);}
+.tnav{display:flex;gap:2px;padding:10px 0 0;margin-bottom:16px;border-bottom:2px solid var(--bdr);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.tnav::-webkit-scrollbar{display:none;}
+.tbtn{padding:8px 12px;border:none;background:transparent;cursor:pointer;font-family:'Nunito';font-size:.79rem;font-weight:600;color:var(--gray);border-radius:8px 8px 0 0;white-space:nowrap;min-height:44px;transition:color .15s,background .15s;}
+.tbtn:hover{color:var(--blue);background:var(--bl);}
+.tbtn.on{color:var(--blue);background:white;border:2px solid var(--bdr);border-bottom:2px solid white;margin-bottom:-2px;}
+.stnav{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;}
+.stbtn{padding:6px 13px;border:1.5px solid var(--bdr);background:white;cursor:pointer;font-family:'Nunito';font-size:.75rem;font-weight:600;color:var(--gray);border-radius:20px;white-space:nowrap;min-height:36px;transition:all .15s;}
+.stbtn:hover{color:var(--blue);border-color:var(--blue);}
+.stbtn.on{color:white;background:var(--blue);border-color:var(--blue);}
+.card{background:var(--paper);border:1px solid var(--bdr);border-radius:13px;padding:16px;margin-bottom:13px;box-shadow:var(--shad);}
+.ch{font-size:.82rem;font-weight:700;color:var(--blue);margin-bottom:11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sub{font-weight:400;color:var(--gray);font-size:.72rem;}
+.inp{padding:10px 12px;border:1.5px solid var(--bdr);border-radius:9px;font-family:'Nunito';font-size:.84rem;background:var(--cream);outline:none;transition:border-color .15s;width:100%;min-height:44px;}
+.inp:focus{border-color:var(--blue);background:white;}
+.sel{-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%236B7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;}
+textarea.inp{min-height:80px;resize:vertical;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 16px;border:none;border-radius:9px;cursor:pointer;font-family:'Nunito';font-size:.83rem;font-weight:600;transition:all .15s;white-space:nowrap;min-height:44px;-webkit-tap-highlight-color:transparent;text-decoration:none;}
+.bp{background:var(--blue);color:white;}.bp:hover{background:#122C55;}.bp:disabled{background:var(--gray2);cursor:not-allowed;opacity:.75;}
+.bo{background:transparent;color:var(--blue);border:1.5px solid var(--blue);}.bo:hover{background:var(--bl);}
+.bg{background:transparent;color:var(--gray);border:1.5px solid var(--bdr);}.bg:hover{color:var(--blue);border-color:var(--blue);}
+.br{background:#FEF2F2;color:#B91C1C;border:none;}.br:hover{background:#FEE2E2;}
+.bsm{padding:7px 12px;font-size:.76rem;min-height:38px;}.bxs{padding:5px 9px;font-size:.72rem;border-radius:7px;min-height:34px;}
+.row{display:flex;gap:10px;align-items:center;}.roww{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+.col{display:flex;flex-direction:column;gap:8px;}
+.f1{flex:1;min-width:0;}.f2{flex:2;min-width:0;}
+.mt4{margin-top:4px;}.mt8{margin-top:8px;}.mt10{margin-top:10px;}.mt12{margin-top:12px;}.mt16{margin-top:16px;}
+.mb4{margin-bottom:4px;}.mb8{margin-bottom:8px;}.mb10{margin-bottom:10px;}.mb12{margin-bottom:12px;}
+.st{font-size:.78rem;}.xt{font-size:.71rem;}.gt{color:var(--gray);}.mn{font-family:'JetBrains Mono';}
+.li{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 13px;border:1px solid var(--bdr);border-radius:9px;background:white;margin-bottom:6px;transition:border-color .15s;gap:8px;}
+.li:hover{border-color:#B8C9E4;}
+.lil{display:flex;align-items:center;gap:9px;min-width:0;flex:1;}
+.lin{width:26px;height:26px;border-radius:6px;background:var(--bl);color:var(--blue);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bdg{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;font-family:'JetBrains Mono';font-size:.84rem;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0;}
+.bdg:hover{transform:scale(1.09);}.bdg.on{border-color:currentColor;transform:scale(1.12);}
+.bS{background:var(--sb);color:var(--sc);}.bL{background:var(--lb);color:var(--lc);}.bA{background:var(--ab);color:var(--ac);}.bH{background:var(--hb);color:var(--hc);}.bP{background:var(--pb);color:var(--pc);}
+.dz{border:2px dashed var(--bdr);border-radius:13px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;display:block;width:100%;}
+.dz:hover,.dz.act{border-color:var(--blue);background:var(--bl);}
+.pthumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.pthumb{position:relative;width:88px;height:88px;border-radius:9px;overflow:hidden;border:2px solid var(--bdr);flex-shrink:0;}
+.pthumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.pdel{position:absolute;top:3px;right:3px;background:rgba(185,28,28,.88);color:white;border:none;border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;}
+.pstat{position:absolute;bottom:0;left:0;right:0;padding:3px 5px;font-size:.63rem;font-weight:700;text-align:center;}
+.ps-ready{background:rgba(26,60,110,.72);color:white;}.ps-analyzing{background:rgba(146,64,14,.88);color:white;}.ps-done{background:rgba(6,95,70,.8);color:white;}.ps-error{background:rgba(185,28,28,.88);color:white;}
+.er{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--bdr);border-radius:9px;background:white;margin-bottom:5px;}
+.er:hover{border-color:#B8C9E4;}
+.sg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.sb2{border-radius:10px;padding:10px 5px;text-align:center;}
+.sbv{font-size:1.45rem;font-weight:700;font-family:'JetBrains Mono';}
+.sbl{font-size:.67rem;font-weight:700;margin-top:2px;}
+.infob{border-radius:9px;padding:8px 12px;font-size:.78rem;}
+.infob-b{background:#DBEAFE;color:#1E40AF;}.infob-g{background:#D1FAE5;color:#065F46;}.infob-r{background:#FEE2E2;color:#991B1B;}.infob-y{background:#FEF3C7;color:#92400E;}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;}
+table.rt{width:100%;border-collapse:collapse;font-size:.80rem;}
+table.rt thead th{background:var(--blue);color:white;padding:9px 11px;text-align:center;font-weight:700;font-size:.75rem;}
+table.rt thead th:first-child{text-align:left;border-radius:9px 0 0 0;}
+table.rt thead th:last-child{border-radius:0 9px 0 0;}
+table.rt tbody tr{cursor:pointer;}
+table.rt tbody tr:hover td{background:var(--bl);}
+table.rt tbody td{padding:8px 11px;text-align:center;border-bottom:1px solid var(--bdr);}
+table.rt tbody td:first-child{text-align:left;font-weight:600;}
+table.rt tfoot td{padding:9px 11px;text-align:center;font-weight:700;background:var(--cream);border-top:2px solid var(--bdr);font-size:.79rem;}
+table.rt tfoot td:first-child{text-align:left;}
+.sortable{cursor:pointer;user-select:none;}.sortable:hover{background:#162F58;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;}
+.ptag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:.68rem;font-weight:700;background:var(--bl);color:var(--blue);margin:2px;}
+.pcat{font-size:.71rem;font-weight:800;color:var(--blue);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.pcheck{display:flex;align-items:center;gap:6px;cursor:pointer;padding:5px 10px;border-radius:20px;border:1.5px solid var(--bdr);background:white;font-size:.77rem;font-weight:600;min-height:36px;transition:all .13s;}
+.pcheck.on{border-color:var(--blue);background:var(--bl);color:var(--blue);}
+.rerr{display:flex;align-items:center;gap:8px;padding:6px 10px;background:white;border:1px solid var(--bdr);border-radius:9px;margin-bottom:5px;}
+.hbar-wrap{background:#E5E7EB;border-radius:6px;height:8px;overflow:hidden;flex:1;min-width:40px;}
+.hbar-fill{height:100%;border-radius:6px;transition:width .4s;}
+.chart-box{background:var(--paper);border:1px solid var(--bdr);border-radius:11px;padding:13px;margin-bottom:12px;}
+.chart-title{font-size:.78rem;font-weight:700;color:var(--blue);margin-bottom:8px;}
+.lgd{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.lgdi{display:flex;align-items:center;gap:5px;font-size:.74rem;font-weight:700;cursor:pointer;padding:5px 9px;border-radius:20px;border:1.5px solid transparent;min-height:34px;transition:all .15s;}
+.lgdi:hover{border-color:currentColor;}.lgdi.off{opacity:.28;}
+.lgdd{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:22px;font-size:.82rem;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.15);animation:su .22s ease;pointer-events:none;max-width:92vw;text-align:center;}
+@keyframes su{from{opacity:0;transform:translateX(-50%) translateY(10px);}}
+.tok{background:#D1FAE5;color:#065F46;}.terr{background:#FEE2E2;color:#991B1B;}.tinf{background:#DBEAFE;color:#1E40AF;}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:28px 16px;color:var(--gray);}
+.ei{font-size:2.4rem;margin-bottom:8px;}
+pre.prompt{font-family:'JetBrains Mono';font-size:.72rem;white-space:pre-wrap;word-break:break-word;color:var(--ink);line-height:1.5;background:var(--cream);border-radius:8px;padding:12px;border:1px solid var(--bdr);}
+@media print{
+  .no-print{display:none!important;}
+  body{background:white;}.app{max-width:100%;padding:0;}
+  .card{border:1px solid #ccc;box-shadow:none;break-inside:avoid;page-break-inside:avoid;}
+  .tnav,.stnav{display:none!important;}
+  @page{margin:1.5cm;}
+}
+@media(max-width:600px){
+  .sg{grid-template-columns:repeat(3,1fr);}
+  .tbtn{padding:7px 9px;font-size:.74rem;}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect} = React;
+const ce = React.createElement;
+
+const VER = '1.0';
+const CC = {
+  S:{l:'Son',        c:'#C05621',b:'#FFF8F3'},
+  L:{l:'Lexique',    c:'#6D28D9',b:'#F5F3FF'},
+  A:{l:'Accord',     c:'#1D4ED8',b:'#EFF6FF'},
+  H:{l:'Homophone',  c:'#047857',b:'#ECFDF5'},
+  P:{l:'Ponctuation',c:'#B91C1C',b:'#FEF2F2'}
+};
+const CK = ['S','L','A','H','P'];
+const PROFILES = [
+  {cat:'Difficultés identifiées',items:[
+    {k:'dys',l:'DYS (dyslexie/dysorthographie)'},{k:'tdah',l:'TDAH'},
+    {k:'dysphasie',l:'Dysphasie'},{k:'allophone',l:'Allophone'},
+    {k:'ldiff',l:'Lecteur en difficulté'},{k:'gdiff',l:'Grande difficulté scolaire'}
+  ]},
+  {cat:'Profil général',items:[
+    {k:'petitlect',l:'Petit lecteur'},{k:'moyenlect',l:'Lecteur moyen'},
+    {k:'bonlect',l:'Bon lecteur'},{k:'perf',l:'Performant / EIP'}
+  ]},
+  {cat:'Besoins pédagogiques',items:[
+    {k:'visuels',l:'Supports visuels'},{k:'consignes',l:'Consignes simplifiées'},
+    {k:'manip',l:'Besoin de manipulation'},{k:'lent',l:'Élève lent'}
+  ]},
+  {cat:'Dynamique',items:[
+    {k:'autonome',l:'Élève autonome'},{k:'progres',l:'En progrès'},{k:'decroch',l:'Décrocheur'}
+  ]}
+];
+const SEUILS = {
+  P1:{Facile:[4,8], Moyen:[6,12],Difficile:[8,16]},
+  P2:{Facile:[3,6], Moyen:[5,10],Difficile:[7,13]},
+  P3:{Facile:[2,5], Moyen:[4,8], Difficile:[6,11]},
+  P4:{Facile:[2,4], Moyen:[3,6], Difficile:[5,9]},
+  P5:{Facile:[1,3], Moyen:[2,5], Difficile:[4,7]}
+};
+const AI_PROV = {
+  mistral:{label:'Mistral AI',url:'https://api.mistral.ai/v1/chat/completions',vm:'pixtral-12b-2409',tm:'mistral-large-latest'},
+  openai: {label:'OpenAI',    url:'https://api.openai.com/v1/chat/completions', vm:'gpt-4o',          tm:'gpt-4o'},
+  custom: {label:'Autre IA',  url:'',vm:'',tm:''}
+};
+const LSK = {e:'cm1cc-e',d:'cm1cc-d',a:'cm1cc-a',c:'cm1cc-c'};
+const OCR_PROMPT = 'Dicte corrige par enseignant : mots souligns codes S=son/phonetique L=lexique A=accord H=homophone P=ponctuation. Extrais TOUS mots et code. Reponds UNIQUEMENT JSON valide : [{"mot":"maison","code":"L"}]. Si aucune erreur : []. Sois exhaustif.';
+const PROMPT_EXOS = `Tu es un enseignant expert en orthographe française pour le Cycle 3 (CM1/CM2, 9-11 ans).
+
+TYPES D'ERREURS : S=son/phonétique | L=lexique | A=accord | H=homophone | P=ponctuation
+
+FORMES D'EXERCICES : relier, compléter les blancs, entourer, écrire, vrai/faux, QCM, remettre en ordre, transformer
+
+ADAPTATION PROFIL ÉLÈVE :
+- DYS : phrases courtes, espacement généreux, police sans serif, pas de fond chargé
+- TDAH : exercices courts et variés, feedbacks immédiats
+- EIP / Performant : justification demandée, exercices complexes avec règle à formuler
+- Allophone : vocabulaire simplifié, support visuel, exemples concrets
+- Lecteur en difficulté : consignes simplifiées, nombreux exemples résolus
+- Élève lent : exercices courts, moins d'items par exercice
+
+FORMAT DE RÉPONSE pour chaque exercice :
+Titre | Consigne claire | Exemple résolu | Corps de l'exercice | Correction complète`;
+
+const PROMPT_DICT = `Tu es un enseignant expert en orthographe française pour le Cycle 3 (CM1/CM2, 9-11 ans).
+
+PROGRESSIVITÉ DES DICTÉES :
+- P1 : 30-40 mots | P2 : 40-50 mots | P3 : 50-65 mots | P4 : 65-80 mots | P5 : 80-100 mots
+
+TYPES D'ERREURS À CIBLER : S=son | L=lexique | A=accord | H=homophone | P=ponctuation
+
+THÈMES POSSIBLES : animaux, nature, école, famille, voyages, contes, sciences, sport, histoire
+
+FORMAT DE RÉPONSE :
+1. La dictée complète
+2. Points grammaticaux travaillés
+3. Mots difficiles signalés avec type d'erreur probable
+4. Variante facilitée (profil DYS/difficulté)
+5. Variante enrichie (profil EIP/performant)`;
+
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const lget = (k,fb) => { try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(x){return fb;} };
+const lset = (k,v)  => { try{localStorage.setItem(k,JSON.stringify(v));}catch(x){} };
+const cnt  = errs   => { const r={S:0,L:0,A:0,H:0,P:0}; (errs||[]).forEach(e=>{if(r[e.code]!==undefined)r[e.code]++;}); return r; };
+const tot  = c      => c.S+c.L+c.A+c.H+c.P;
+const clr  = (total,per,diff) => { const s=((SEUILS[per]||SEUILS.P3)[diff]||[3,6]); return total<=s[0]?'g':total<=s[1]?'o':'r'; };
+const clrC = c => c==='g'?'#10B981':c==='o'?'#F59E0B':'#EF4444';
+const pLabel = k => { let r=k; PROFILES.forEach(c=>c.items.forEach(i=>{if(i.k===k)r=i.l;})); return r; };
+const trunc = (s,n) => s&&s.length>n?s.slice(0,n)+'…':s||'';
+
+/* ── CHART COMPONENTS ── */
+function LineChart(props) {
+  const series=props.series||[], labels=props.labels||[], H=props.h||150;
+  if (labels.length<2) return ce('p',{style:{textAlign:'center',padding:12,color:'var(--gray)',fontSize:'.81rem'}},'✏️ 2 dictées minimum pour la progression');
+  const W=500,PL=28,PR=8,PT=10,PB=26,cW=W-PL-PR,cH=H-PT-PB,n=labels.length;
+  let mx=0; series.forEach(s=>(s.vals||[]).forEach(v=>{if(v>mx)mx=v;})); mx=Math.max(mx,1);
+  const xs=n>1?cW/(n-1):0;
+  const px=i=>PL+i*xs, py=v=>PT+cH-(v/mx)*cH;
+  const pd=vals=>(vals||[]).map((v,i)=>(i===0?'M':'L')+px(i).toFixed(1)+','+py(v).toFixed(1)).join(' ');
+  return ce('svg',{viewBox:'0 0 '+W+' '+H,style:{width:'100%',display:'block'}},
+    ...[0,.25,.5,.75,1].map((t,i)=>ce('g',{key:'g'+i},
+      ce('line',{x1:PL,y1:PT+cH*(1-t),x2:W-PR,y2:PT+cH*(1-t),stroke:'#E5E1D8',strokeWidth:1}),
+      ce('text',{x:PL-3,y:PT+cH*(1-t)+4,fontSize:9,fill:'#9CA3AF',textAnchor:'end',fontFamily:'JetBrains Mono'},Math.round(t*mx))
+    )),
+    ...series.map(s=>ce('g',{key:s.name},
+      ce('path',{d:pd(s.vals),fill:'none',stroke:s.color,strokeWidth:2.5,strokeLinecap:'round',strokeLinejoin:'round'}),
+      ...(s.vals||[]).map((v,i)=>ce('circle',{key:i,cx:px(i),cy:py(v),r:4,fill:s.color,stroke:'white',strokeWidth:1.5}))
+    )),
+    ...labels.map((l,i)=>ce('text',{key:'l'+i,x:px(i),y:H-4,fontSize:9,fill:'#6B7280',textAnchor:i===0?'start':i===n-1?'end':'middle',fontFamily:'Nunito'},trunc(l,11)))
+  );
+}
+
+function BarChart(props) {
+  const data=props.data||[];
+  if (!data.length) return ce('p',{style:{textAlign:'center',padding:12,color:'var(--gray)',fontSize:'.81rem'}},'Pas de données');
+  const W=500,H=160,PL=28,PR=8,PT=10,PB=26,cW=W-PL-PR,cH=H-PT-PB,n=data.length;
+  let mx=0; data.forEach(d=>CK.forEach(k=>{const v=d[k]||0;if(v>mx)mx=v;})); mx=Math.max(mx,1);
+  const grpW=cW/n, bw=Math.max(4,(grpW-6)/(CK.length+.5));
+  return ce('svg',{viewBox:'0 0 '+W+' '+H,style:{width:'100%',display:'block'}},
+    ...[0,.25,.5,.75,1].map((t,i)=>ce('g',{key:'g'+i},
+      ce('line',{x1:PL,y1:PT+cH*(1-t),x2:W-PR,y2:PT+cH*(1-t),stroke:'#E5E1D8',strokeWidth:1}),
+      ce('text',{x:PL-3,y:PT+cH*(1-t)+4,fontSize:9,fill:'#9CA3AF',textAnchor:'end',fontFamily:'JetBrains Mono'},Math.round(t*mx))
+    )),
+    ...data.map((d,i)=>ce('g',{key:'b'+i},
+      ...CK.map((k,ki)=>{const bh=((d[k]||0)/mx)*cH,x=PL+i*grpW+ki*(bw+1)+2;return ce('rect',{key:k,x:x.toFixed(1),y:(PT+cH-bh).toFixed(1),width:bw.toFixed(1),height:Math.max(1,bh).toFixed(1),fill:CC[k].c,rx:2,opacity:.85});}),
+      ce('text',{x:(PL+i*grpW+grpW/2).toFixed(1),y:H-4,fontSize:9,fill:'#6B7280',textAnchor:'middle',fontFamily:'Nunito'},trunc(d.label||'',9))
+    ))
+  );
+}
+
+function DonutChart(props) {
+  const data=props.data||[], sz=props.sz||120, S=sz, cx=S/2, cy=S/2, R=S*.38, r=S*.22;
+  const total=data.reduce((s,d)=>s+(d.v||0),0);
+  if (!total) return ce('div',{style:{width:S,height:S,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.78rem',color:'var(--gray)'}},'–');
+  const segs=[]; let ang=-Math.PI/2;
+  data.forEach((d,i)=>{
+    if (!d.v) return;
+    const a=(d.v/total)*2*Math.PI, ea=ang+a, la=a>Math.PI?1:0;
+    const c1=Math.cos(ang),s1=Math.sin(ang),c2=Math.cos(ea),s2=Math.sin(ea);
+    const pd='M '+(cx+R*c1).toFixed(2)+' '+(cy+R*s1).toFixed(2)+' A '+R+' '+R+' 0 '+la+' 1 '+(cx+R*c2).toFixed(2)+' '+(cy+R*s2).toFixed(2)+' L '+(cx+r*c2).toFixed(2)+' '+(cy+r*s2).toFixed(2)+' A '+r+' '+r+' 0 '+la+' 0 '+(cx+r*c1).toFixed(2)+' '+(cy+r*s1).toFixed(2)+' Z';
+    segs.push(ce('path',{key:i,d:pd,fill:d.c,opacity:.87,stroke:'white',strokeWidth:1.5}));
+    ang=ea;
+  });
+  return ce('svg',{viewBox:'0 0 '+S+' '+S,style:{width:S,height:S,display:'block',flexShrink:0}},
+    ...segs,
+    ce('text',{x:cx,y:cy+5,textAnchor:'middle',fontSize:13,fontWeight:700,fill:'#1A1A2E',fontFamily:'JetBrains Mono'},total)
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   APP
+══════════════════════════════════════════════════════════════ */
+function App() {
+  const [eleves,  se] = useState(()=>lget(LSK.e,[]));
+  const [dictees, sd] = useState(()=>lget(LSK.d,[]));
+  const [analyses,sa] = useState(()=>lget(LSK.a,[]));
+  const [cfg,     sc] = useState(()=>lget(LSK.c,{provider:'mistral',mk:'',openaiKey:'',customUrl:'',customKey:'',customVModel:''}));
+  const [tab,   stab] = useState(0);
+  const [toast,stoast]= useState(null);
+  /* T1 */
+  const [t1key, st1key]=useState(0);
+  const [t1nom, st1nom]=useState('');
+  const [t1edit,st1edit]=useState(null);
+  const [t1en,  st1en] =useState('');
+  const [t1ep,  st1ep] =useState([]);
+  const [t1eno, st1eno]=useState('');
+  /* T2 */
+  const [t2key, st2key]=useState(0);
+  const [t2tit, st2tit]=useState('');
+  const [t2dat, st2dat]=useState('');
+  const [t2per, st2per]=useState('P1');
+  const [t2dif, st2dif]=useState('Moyen');
+  const [t2exp, st2exp]=useState(null);
+  /* T3 */
+  const [t3el,   st3el]  =useState('');
+  const [t3di,   st3di]  =useState('');
+  const [t3ph,   st3ph]  =useState([]);
+  const [t3er,   st3er]  =useState([]);
+  const [t3mode, st3mode]=useState('photo');
+  const [t3busy, st3busy]=useState(false);
+  /* T4 */
+  const [t4sub,  st4sub] =useState(0);
+  const [t4el,   st4el]  =useState('');
+  const [t4evo,  st4evo] =useState('');
+  const [t4ck,   st4ck]  =useState(CK.slice());
+  const [t4xp,   st4xp]  =useState(null);
+  const [t4sort, st4sort]=useState({col:'nom',dir:1});
+
+  useEffect(()=>{lset(LSK.e,eleves);},[eleves]);
+  useEffect(()=>{lset(LSK.d,dictees);},[dictees]);
+  useEffect(()=>{lset(LSK.a,analyses);},[analyses]);
+  useEffect(()=>{lset(LSK.c,cfg);},[cfg]);
+
+  /* ── HELPERS ── */
+  const msg = (m,tp) => { stoast({m,tp:tp||'ok'}); setTimeout(()=>stoast(null),3200); };
+
+  const getAIConf = () => {
+    const p=cfg.provider||'mistral', pd=AI_PROV[p]||AI_PROV.mistral;
+    const key=p==='openai'?(cfg.openaiKey||''):p==='custom'?(cfg.customKey||''):(cfg.mk||'');
+    const url=p==='custom'?(cfg.customUrl||''):pd.url;
+    const vm=p==='custom'?(cfg.customVModel||''):pd.vm;
+    return {key,url,vm};
+  };
+
+  const analyzePhoto = async (ph) => {
+    const {key,url,vm}=getAIConf();
+    if (!key){ msg('Clé API manquante — onglet ⑥','err'); return; }
+    st3ph(prev=>prev.map(p=>p.id===ph.id?Object.assign({},p,{status:'analyzing'}):p));
+    try {
+      const resp=await fetch(url,{method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:vm,max_tokens:2000,messages:[{role:'user',content:[
+          {type:'text',text:OCR_PROMPT},
+          {type:'image_url',image_url:{url:ph.dataUrl}}
+        ]}]})
+      });
+      const data=await resp.json();
+      if (!resp.ok) throw new Error((data.error&&data.error.message)||'HTTP '+resp.status);
+      const txt=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
+      const m2=txt.match(/\[[\s\S]*\]/);
+      const parsed=m2?JSON.parse(m2[0]):[];
+      const errs=(Array.isArray(parsed)?parsed:[]).map(r=>({id:uid(),mot:r.mot||'',code:CK.includes(r.code)?r.code:'L'}));
+      st3ph(prev=>prev.map(p=>p.id===ph.id?Object.assign({},p,{status:'done',errors:errs}):p));
+      st3er(prev=>[...prev,...errs]);
+      msg(errs.length+' erreur(s) détectée(s)');
+    } catch(ex) {
+      st3ph(prev=>prev.map(p=>p.id===ph.id?Object.assign({},p,{status:'error'}):p));
+      msg('Erreur : '+ex.message,'err');
+    }
+  };
+
+  const analyzeAll = async () => {
+    if (t3busy) return;
+    const ready=t3ph.filter(p=>p.status==='ready'||p.status==='error');
+    if (!ready.length){ msg('Aucune photo à analyser','inf'); return; }
+    st3busy(true);
+    for (let i=0;i<ready.length;i++) await analyzePhoto(ready[i]);
+    st3busy(false); msg('✅ Analyse terminée — vérifiez les erreurs');
+  };
+
+  const loadExisting = (eId,dId) => {
+    const ex=analyses.find(a=>a.eleveId===eId&&a.dicteeId===dId);
+    st3er(ex?(ex.erreurs||[]).map(r=>Object.assign({},r)):[]);
+    st3ph([]);
+  };
+
+  const saveAnalysis = () => {
+    if (!t3el){ msg('Sélectionner un élève','err'); return; }
+    if (!t3di){ msg('Sélectionner une dictée','err'); return; }
+    const valid=t3er.filter(r=>(r.mot||'').trim()!=='');
+    const ex=analyses.find(a=>a.eleveId===t3el&&a.dicteeId===t3di);
+    if (ex) sa(p=>p.map(a=>(a.eleveId===t3el&&a.dicteeId===t3di)?Object.assign({},a,{erreurs:valid,updAt:new Date().toISOString()}):a));
+    else    sa(p=>[...p,{id:uid(),eleveId:t3el,dicteeId:t3di,erreurs:valid,creAt:new Date().toISOString()}]);
+    msg('✅ Enregistré — '+valid.length+' erreur(s)');
+  };
+
+  const getRecurring = (dicteeId) => {
+    const anals=analyses.filter(a=>a.dicteeId===dicteeId);
+    if (anals.length<2) return [];
+    const freq={};
+    anals.forEach(a=>(a.erreurs||[]).forEach(e=>{
+      const mot=(e.mot||'').trim().toLowerCase(); if (!mot) return;
+      const key=mot+'|'+e.code;
+      if (!freq[key]) freq[key]={mot:e.mot,code:e.code,count:0};
+      freq[key].count++;
+    }));
+    return Object.values(freq).filter(f=>f.count>=2).sort((a,b)=>b.count-a.count).slice(0,8);
+  };
+
+  const exportJSON = () => {
+    const data={version:VER,exportDate:new Date().toISOString(),eleves,dictees,analyses};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='cm1-corrections-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    msg('⬇️ Export réussi — sauvegardez sur OneDrive !');
+  };
+
+  const importJSON = (file) => {
+    if (!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try {
+        const data=JSON.parse(ev.target.result);
+        if (!data.eleves&&!data.dictees) throw new Error('Format invalide');
+        if (data.eleves)   se(data.eleves);
+        if (data.dictees)  sd(data.dictees);
+        if (data.analyses) sa(data.analyses);
+        msg('✅ Import — '+(data.eleves||[]).length+' élèves chargés');
+      } catch(ex){ msg('Fichier JSON invalide','err'); }
+    };
+    reader.readAsText(file);
+  };
+
+  /* ── STATS HELPERS ── */
+  const getElStats = (eleveId) => {
+    const anals=analyses.filter(a=>a.eleveId===eleveId);
+    if (!anals.length) return null;
+    const totals={S:0,L:0,A:0,H:0,P:0};
+    anals.forEach(a=>{ const c=cnt(a.erreurs||[]); CK.forEach(k=>totals[k]+=c[k]); });
+    return {totals,count:anals.length,avg:tot(totals)/anals.length};
+  };
+
+  const getElEvo = (eleveId) => dictees.map(d=>{
+    const a=analyses.find(x=>x.eleveId===eleveId&&x.dicteeId===d.id);
+    if (!a) return null;
+    const c=cnt(a.erreurs||[]);
+    return {label:trunc(d.titre,12),...c,total:tot(c)};
+  }).filter(x=>x!==null);
+
+  const getClassEvo = () => dictees.map(d=>{
+    const anals=analyses.filter(a=>a.dicteeId===d.id);
+    if (!anals.length) return null;
+    const totals={S:0,L:0,A:0,H:0,P:0};
+    anals.forEach(a=>{ const c=cnt(a.erreurs||[]); CK.forEach(k=>totals[k]+=c[k]); });
+    const n=anals.length;
+    return {label:trunc(d.titre,12),S:totals.S/n,L:totals.L/n,A:totals.A/n,H:totals.H/n,P:totals.P/n,total:tot(totals)/n,n};
+  }).filter(x=>x!==null);
+
+  const sortedEleves = () => {
+    const col=t4sort.col, dir=t4sort.dir;
+    return [...eleves].sort((a,b)=>{
+      if (col==='nom') return dir*a.nom.localeCompare(b.nom);
+      const sa2=getElStats(a.id), sb2=getElStats(b.id);
+      const av=sa2?(col==='tot'?tot(sa2.totals):(sa2.totals[col]||0)):-1;
+      const bv=sb2?(col==='tot'?tot(sb2.totals):(sb2.totals[col]||0)):-1;
+      return dir*(bv-av);
+    });
+  };
+
+  /* ── RENDER HELPERS ── */
+  const Bdg = k => ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c,marginRight:3}},k);
+  const profileTags = el => {
+    const profs=(el&&el.profiles)||[];
+    if (!profs.length) return null;
+    return ce('div',{style:{display:'flex',flexWrap:'wrap',gap:3,marginTop:4}},
+      ...profs.map(k=>ce('span',{key:k,className:'ptag'},pLabel(k)))
+    );
+  };
+  const HBar = (value,maxV,color) => {
+    const pct=maxV>0?Math.min(value/maxV,1):0;
+    return ce('div',{className:'hbar-wrap'},ce('div',{className:'hbar-fill',style:{width:(pct*100)+'%',background:color||'var(--blue)'}}));
+  };
+
+  /* ══════════════════════════════════════════════════════
+     T1 — ÉLÈVES
+  ══════════════════════════════════════════════════════ */
+  function T1() {
+    const openEdit = el => { st1edit(el.id); st1en(el.nom); st1ep(el.profiles||[]); st1eno(el.notes||''); };
+    const saveEdit = () => {
+      if (!t1en.trim()) return;
+      se(p=>p.map(el=>el.id===t1edit?Object.assign({},el,{nom:t1en.trim(),profiles:t1ep,notes:t1eno}):el));
+      st1edit(null); msg('✅ Profil mis à jour');
+    };
+    const addEl = () => {
+      const n=t1nom.trim(); if (!n) return;
+      if (eleves.some(el=>el.nom.toLowerCase()===n.toLowerCase())){ msg('Élève déjà présent','err'); return; }
+      se(p=>[...p,{id:uid(),nom:n,profiles:[],notes:''}]);
+      st1nom(''); st1key(k=>k+1); msg(n+' ajouté(e)');
+    };
+    const toggleP = k => st1ep(p=>p.includes(k)?p.filter(x=>x!==k):[...p,k]);
+
+    if (t1edit) {
+      const el=eleves.find(e=>e.id===t1edit);
+      if (!el){ st1edit(null); return null; }
+      return ce('div',null,
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},
+            ce('button',{className:'btn bg bsm no-print',onClick:()=>st1edit(null)},'← Retour'),
+            '✏️ Profil : '+el.nom
+          ),
+          ce('div',{className:'col mb10'},
+            ce('label',{className:'xt gt',style:{fontWeight:700}},'Nom complet'),
+            ce('input',{key:'en-'+t1edit,className:'inp',defaultValue:t1en,onChange:ev=>st1en(ev.target.value)})
+          ),
+          ...PROFILES.map(cat=>ce('div',{key:cat.cat,className:'mb10'},
+            ce('div',{className:'pcat'},cat.cat),
+            ce('div',{style:{display:'flex',flexWrap:'wrap',gap:5}},
+              ...cat.items.map(item=>ce('label',{key:item.k,className:'pcheck'+(t1ep.includes(item.k)?' on':'')},
+                ce('input',{type:'checkbox',checked:t1ep.includes(item.k),onChange:()=>toggleP(item.k),style:{accentColor:'var(--blue)',width:14,height:14}}),
+                item.l
+              ))
+            )
+          )),
+          ce('div',{className:'mt10'},
+            ce('label',{className:'xt gt mb4',style:{display:'block',fontWeight:700}},'Notes complémentaires'),
+            ce('textarea',{key:'eno-'+t1edit,className:'inp',defaultValue:t1eno,onChange:ev=>st1eno(ev.target.value),placeholder:'Orthophonie, bilingue, rejoint en P2, PAP en cours…'})
+          ),
+          ce('div',{className:'row mt12'},
+            ce('button',{className:'btn bp',onClick:saveEdit},'💾 Enregistrer'),
+            ce('button',{className:'btn bg',onClick:()=>st1edit(null)},'Annuler')
+          )
+        )
+      );
+    }
+
+    return ce('div',null,
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'👤 Ajouter un élève'),
+        ce('div',{key:t1key,className:'row'},
+          ce('input',{className:'inp f1',placeholder:'Prénom Nom',defaultValue:'',
+            onChange:ev=>st1nom(ev.target.value),onKeyDown:ev=>{ if(ev.key==='Enter')addEl(); }}),
+          ce('button',{className:'btn bp',onClick:addEl},'+ Ajouter')
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📋 Classe',ce('span',{className:'sub'},'('+eleves.length+' élève(s))')),
+        eleves.length===0
+          ?ce('div',{className:'empty'},ce('div',{className:'ei'},'👦'),ce('p',null,'Aucun élève — commencez par en ajouter'))
+          :eleves.map((el,i)=>{
+              const stats=getElStats(el.id);
+              return ce('div',{key:el.id,className:'li'},
+                ce('div',{className:'col f1',style:{gap:2}},
+                  ce('div',{className:'row',style:{gap:7}},
+                    ce('div',{className:'lin'},i+1),
+                    ce('span',{style:{fontWeight:700,fontSize:'.84rem'}},el.nom),
+                    stats&&ce('span',{className:'dot',style:{background:clrC(clr(stats.avg,'P3','Moyen'))}})
+                  ),
+                  profileTags(el)
+                ),
+                ce('div',{className:'row'},
+                  stats&&ce('span',{className:'xt gt mn',style:{marginRight:6}},tot(stats.totals)+' err.'),
+                  ce('button',{className:'btn bo bsm',onClick:()=>openEdit(el)},'✏️'),
+                  ce('button',{className:'btn br bsm',onClick:()=>{
+                    if (!window.confirm('Supprimer '+el.nom+' et toutes ses analyses ?')) return;
+                    se(p=>p.filter(x=>x.id!==el.id)); sa(p=>p.filter(x=>x.eleveId!==el.id));
+                    msg('Supprimé','inf');
+                  }},'✕')
+                )
+              );
+            })
+      )
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════
+     T2 — DICTÉES
+  ══════════════════════════════════════════════════════ */
+  function T2() {
+    const add = () => {
+      if (!t2tit.trim()){ msg('Titre requis','err'); return; }
+      sd(p=>[...p,{id:uid(),titre:t2tit.trim(),date:t2dat||new Date().toISOString().slice(0,10),periode:t2per,difficulte:t2dif}]);
+      st2tit(''); st2dat(''); st2key(k=>k+1); msg('Dictée ajoutée');
+    };
+    return ce('div',null,
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📝 Nouvelle dictée'),
+        ce('div',{key:t2key,className:'col'},
+          ce('input',{className:'inp',placeholder:'Titre de la dictée…',defaultValue:'',onChange:ev=>st2tit(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')add();}}),
+          ce('div',{className:'roww'},
+            ce('input',{type:'date',className:'inp sel f1',style:{minWidth:130},defaultValue:'',onChange:ev=>st2dat(ev.target.value)}),
+            ce('select',{className:'inp sel',style:{flex:1},defaultValue:'P1',onChange:ev=>st2per(ev.target.value)},
+              ['P1','P2','P3','P4','P5'].map(p=>ce('option',{key:p,value:p},p))
+            ),
+            ce('select',{className:'inp sel',style:{flex:1},defaultValue:'Moyen',onChange:ev=>st2dif(ev.target.value)},
+              ['Facile','Moyen','Difficile'].map(d=>ce('option',{key:d,value:d},d))
+            )
+          ),
+          ce('button',{className:'btn bp',style:{alignSelf:'flex-start'},onClick:add},'+ Ajouter')
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📚 Dictées',ce('span',{className:'sub'},'('+dictees.length+')')),
+        dictees.length===0
+          ?ce('div',{className:'empty'},ce('div',{className:'ei'},'📖'),ce('p',null,'Aucune dictée'))
+          :[...dictees].reverse().map(d=>{
+              const rec=getRecurring(d.id), nb=analyses.filter(a=>a.dicteeId===d.id).length, open=t2exp===d.id;
+              return ce('div',{key:d.id,className:'card',style:{marginBottom:8,padding:'10px 13px'}},
+                ce('div',{className:'row'},
+                  ce('div',{className:'col f1',style:{gap:2}},
+                    ce('span',{style:{fontWeight:700,fontSize:'.85rem'}},d.titre),
+                    ce('span',{className:'xt gt'},d.date+' · '+d.periode+' · '+d.difficulte+' · '+nb+'/'+eleves.length+' corr.')
+                  ),
+                  ce('div',{className:'row'},
+                    rec.length>0&&ce('button',{className:'btn bg bsm',onClick:()=>st2exp(open?null:d.id)},open?'▲':'🔥 '+rec.length),
+                    ce('button',{className:'btn br bsm',onClick:()=>{
+                      if (!window.confirm('Supprimer cette dictée et ses analyses ?')) return;
+                      sd(p=>p.filter(x=>x.id!==d.id)); sa(p=>p.filter(x=>x.dicteeId!==d.id));
+                      msg('Supprimée','inf');
+                    }},'✕')
+                  )
+                ),
+                open&&rec.length>0&&ce('div',{className:'mt10'},
+                  ce('div',{className:'xt gt mb8',style:{fontWeight:700}},'🔥 Fautes récurrentes (≥ 2 élèves)'),
+                  ...rec.map(r=>ce('div',{key:r.mot+r.code,className:'rerr'},
+                    Bdg(r.code),
+                    ce('span',{style:{fontWeight:600,flex:1,fontSize:'.81rem'}},r.mot),
+                    ce('span',{className:'xt gt mn',style:{marginRight:8,flexShrink:0}},r.count+'/'+nb),
+                    HBar(r.count,nb,CC[r.code].c)
+                  ))
+                )
+              );
+            })
+      )
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════
+     T3 — ANALYSER
+  ══════════════════════════════════════════════════════ */
+  function T3() {
+    const addPh = files => Array.from(files).forEach(file=>{
+      if (!file.type.startsWith('image/')) return;
+      const rd=new FileReader();
+      rd.onload=ev=>st3ph(prev=>[...prev,{id:uid(),dataUrl:ev.target.result,status:'ready',errors:[]}]);
+      rd.readAsDataURL(file);
+    });
+    const addRow  = () => st3er(p=>[...p,{id:uid(),mot:'',code:'L'}]);
+    const delRow  = id => st3er(p=>p.filter(r=>r.id!==id));
+    const updCode = (id,code) => st3er(p=>p.map(r=>r.id===id?Object.assign({},r,{code}):r));
+    const updMot  = (id,mot)  => st3er(p=>p.map(r=>r.id===id?Object.assign({},r,{mot}):r));
+    const curEl=t3el?eleves.find(e=>e.id===t3el):null;
+    const hasEx=!!(t3el&&t3di&&analyses.find(a=>a.eleveId===t3el&&a.dicteeId===t3di));
+    const counts=cnt(t3er), totalErr=tot(counts);
+    const canAna=t3ph.some(p=>p.status==='ready'||p.status==='error');
+    const aiKey=getAIConf().key;
+
+    return ce('div',null,
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'🎯 Sélectionner élève + dictée'),
+        ce('div',{className:'roww'},
+          ce('select',{className:'inp sel f1',defaultValue:t3el,onChange:ev=>{ st3el(ev.target.value); loadExisting(ev.target.value,t3di); }},
+            ce('option',{value:''},'— Choisir un élève —'),
+            ...eleves.map(el=>ce('option',{key:el.id,value:el.id},el.nom))
+          ),
+          ce('select',{className:'inp sel f1',defaultValue:t3di,onChange:ev=>{ st3di(ev.target.value); loadExisting(t3el,ev.target.value); }},
+            ce('option',{value:''},'— Choisir une dictée —'),
+            ...dictees.map(d=>ce('option',{key:d.id,value:d.id},d.titre+' · '+d.date))
+          )
+        ),
+        curEl&&(curEl.profiles||[]).length>0&&ce('div',{className:'mt8'},
+          ce('span',{className:'xt gt',style:{marginRight:4}},'Profil :'),
+          ...(curEl.profiles||[]).map(k=>ce('span',{key:k,className:'ptag'},pLabel(k)))
+        ),
+        hasEx&&ce('div',{className:'infob infob-y mt8'},'⚠️ Analyse existante chargée — enregistrer remplacera les données.')
+      ),
+
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📋 Mode de saisie'),
+        ce('div',{className:'row'},
+          ce('button',{className:'btn '+(t3mode==='photo'?'bp':'bg'),onClick:()=>st3mode('photo')},'📷 Photo(s)'),
+          ce('button',{className:'btn '+(t3mode==='manual'?'bp':'bg'),onClick:()=>st3mode('manual')},'✏️ Saisie manuelle')
+        )
+      ),
+
+      t3mode==='photo'&&ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📷 Photos de la correction',ce('span',{className:'sub'},'plusieurs pages autorisées')),
+        ce('label',{className:'dz'},
+          ce('input',{type:'file',accept:'image/*',capture:'environment',multiple:true,style:{display:'none'},onChange:ev=>addPh(ev.target.files)}),
+          ce('div',{style:{fontSize:'2rem',marginBottom:6}},'📷'),
+          ce('div',{style:{fontWeight:700,color:'var(--blue)',fontSize:'.85rem'}},'Photographier la correction ou choisir dans la galerie'),
+          ce('div',{className:'xt gt mt4'},'Dictée sur plusieurs pages ? Ajoutez une photo par page')
+        ),
+        t3ph.length>0&&ce('div',null,
+          ce('div',{className:'pthumbs'},
+            ...t3ph.map(ph=>ce('div',{key:ph.id,className:'pthumb'},
+              ce('img',{src:ph.dataUrl,alt:''}),
+              ce('div',{className:'pstat ps-'+ph.status},
+                ph.status==='ready'?'Prêt':ph.status==='analyzing'?'⏳…':ph.status==='done'?'✓ '+((ph.errors&&ph.errors.length)||0):'✗ Erreur'
+              ),
+              ce('button',{className:'pdel',onClick:()=>st3ph(p=>p.filter(x=>x.id!==ph.id))},'✕')
+            ))
+          ),
+          ce('div',{className:'row mt10'},
+            ce('button',{className:'btn bp',onClick:analyzeAll,disabled:t3busy||!canAna||!aiKey},
+              t3busy?ce('span',{className:'spin'}):'🔍',
+              t3busy?' Analyse en cours…':' Analyser '+t3ph.filter(p=>p.status==='ready'||p.status==='error').length+' photo(s)'
+            ),
+            !aiKey&&ce('span',{className:'xt',style:{color:'#B91C1C',marginLeft:4}},'⚠️ Clé API manquante — onglet ⑥')
+          )
+        )
+      ),
+
+      (t3er.length>0||t3mode==='manual')&&ce('div',{className:'card'},
+        ce('div',{className:'ch'},
+          '📋 Erreurs relevées',
+          totalErr>0&&ce('span',{style:{marginLeft:'auto',display:'flex',gap:4,flexWrap:'wrap'}},
+            ...CK.filter(k=>counts[k]>0).map(k=>ce('span',{key:k,className:'chip',style:{background:CC[k].b,color:CC[k].c}},k+':'+counts[k]))
+          )
+        ),
+        t3er.map(r=>ce('div',{key:r.id,className:'er'},
+          ce('input',{className:'inp f2',style:{minHeight:36,padding:'5px 9px',minWidth:80},placeholder:'Mot fautif…',defaultValue:r.mot,
+            onBlur:ev=>updMot(r.id,ev.target.value)}),
+          ce('div',{className:'row',style:{gap:3,flexShrink:0}},
+            ...CK.map(k=>ce('button',{key:k,className:'bdg b'+k+(r.code===k?' on':''),title:CC[k].l,onClick:()=>updCode(r.id,k)},k))
+          ),
+          ce('button',{className:'btn br bxs',onClick:()=>delRow(r.id)},'✕')
+        )),
+        ce('div',{className:'row mt10'},
+          ce('button',{className:'btn bg',onClick:addRow},'+ Ligne'),
+          t3er.length>0&&ce('button',{className:'btn bg',onClick:()=>{ if(window.confirm('Effacer toutes les erreurs ?'))st3er([]); }},'🗑️ Tout effacer'),
+          ce('button',{className:'btn bp',style:{marginLeft:'auto'},onClick:saveAnalysis},'💾 Enregistrer')
+        )
+      ),
+
+      t3er.length===0&&t3mode==='manual'&&ce('div',{className:'card'},
+        ce('div',{className:'empty'},
+          ce('div',{className:'ei'},'✏️'),
+          ce('p',null,'Sélectionnez élève et dictée, puis saisissez les erreurs'),
+          ce('button',{className:'btn bp mt10',onClick:addRow},'+ Première erreur')
+        )
+      )
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════
+     T4 — STATS (4 sous-onglets)
+  ══════════════════════════════════════════════════════ */
+  function T4() {
+
+    /* ── Sous-onglet 0 : Vue d'ensemble ── */
+    function S0() {
+      const el=t4el?eleves.find(e=>e.id===t4el):null;
+      const stats=el?getElStats(el.id):null;
+      const evo=el?getElEvo(el.id):null;
+      const classEvo=getClassEvo();
+      return ce('div',null,
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},'🔍 Sélectionner un élève'),
+          ce('select',{className:'inp sel',defaultValue:t4el,onChange:ev=>st4el(ev.target.value)},
+            ce('option',{value:''},'— Choisir un élève —'),
+            ...eleves.map(el2=>ce('option',{key:el2.id,value:el2.id},el2.nom))
+          ),
+          el&&profileTags(el),
+          el&&(el.notes)&&ce('div',{className:'infob infob-b mt8 xt'},el.notes)
+        ),
+        !el&&ce('div',{className:'empty'},ce('div',{className:'ei'},'📊'),ce('p',null,'Sélectionnez un élève pour voir ses statistiques')),
+        el&&stats&&ce('div',null,
+          ce('div',{className:'card'},
+            ce('div',{className:'ch'},el.nom+' — Récapitulatif global',ce('span',{className:'sub'}),stats.count+' dictée(s) analysée(s)'),
+            ce('div',{className:'sg',style:{gridTemplateColumns:'repeat(6,1fr)'}},
+              ...CK.map(k=>ce('div',{key:k,className:'sb2',style:{background:CC[k].b}},
+                ce('div',{className:'sbv',style:{color:CC[k].c}},stats.totals[k]),
+                ce('div',{className:'sbl',style:{color:CC[k].c}},CC[k].l)
+              )),
+              ce('div',{className:'sb2',style:{background:'var(--bl)'}},
+                ce('div',{className:'sbv',style:{color:'var(--blue)'}},tot(stats.totals)),
+                ce('div',{className:'sbl',style:{color:'var(--blue)'}},'TOTAL')
+              )
+            ),
+            ce('div',{className:'row mt12',style:{gap:16,flexWrap:'wrap',alignItems:'flex-start'}},
+              ce(DonutChart,{data:CK.map(k=>({v:stats.totals[k],c:CC[k].c})),sz:120}),
+              ce('div',{className:'col f1',style:{gap:6}},
+                ...CK.map(k=>ce('div',{key:k,className:'row',style:{gap:8}},
+                  ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c,width:28,justifyContent:'center'}},k),
+                  HBar(stats.totals[k],Math.max(1,tot(stats.totals)),CC[k].c),
+                  ce('span',{className:'mn xt',style:{color:CC[k].c,width:24,textAlign:'right'}},stats.totals[k])
+                ))
+              )
+            )
+          ),
+          evo&&evo.length>0&&ce('div',{className:'chart-box'},
+            ce('div',{className:'chart-title'},'📈 Évolution de '+el.nom+' — total erreurs par dictée'),
+            ce(LineChart,{series:[{name:el.nom,vals:evo.map(e=>e.total),color:'var(--blue)'}],labels:evo.map(e=>e.label)})
+          ),
+          evo&&evo.length>=2&&ce('div',{className:'chart-box'},
+            ce('div',{className:'chart-title'},'📊 '+el.nom+' — détail par type d\'erreur sur l\'année'),
+            ce(LineChart,{series:CK.map(k=>({name:CC[k].l,vals:evo.map(e=>e[k]),color:CC[k].c})),labels:evo.map(e=>e.label),h:180}),
+            ce('div',{className:'lgd mt8'},
+              ...CK.map(k=>ce('div',{key:k,className:'lgdi',style:{color:CC[k].c,border:'1.5px solid '+CC[k].c,background:CC[k].b}},
+                ce('div',{className:'lgdd',style:{background:CC[k].c}}),CC[k].l
+              ))
+            )
+          ),
+          classEvo.length>0&&evo&&evo.length>0&&ce('div',{className:'chart-box'},
+            ce('div',{className:'chart-title'},'📊 '+el.nom+' vs Moyenne classe (total erreurs)'),
+            ce(LineChart,{series:[
+              {name:el.nom,vals:evo.map(e=>e.total),color:'var(--blue)'},
+              {name:'Classe moy.',vals:classEvo.map(c=>c.total),color:'#9CA3AF'}
+            ],labels:classEvo.map(c=>c.label)})
+          ),
+          ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
+            ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Rapport élève PDF')
+          )
+        ),
+        el&&!stats&&ce('div',{className:'infob infob-y'},'Aucune analyse pour cet élève. Rendez-vous dans l\'onglet ③ Analyser.')
+      );
+    }
+
+    /* ── Sous-onglet 1 : Par élève ── */
+    function S1() {
+      const sorted=sortedEleves();
+      const th=(label,col)=>ce('th',{className:'sortable',onClick:()=>st4sort(prev=>prev.col===col?{col,dir:-prev.dir}:{col,dir:-1})},
+        label+(t4sort.col===col?(t4sort.dir===1?' ↑':' ↓'):'')
+      );
+      return ce('div',null,
+        ce('div',{className:'tw'},
+          ce('table',{className:'rt'},
+            ce('thead',null,ce('tr',null,
+              th('Élève','nom'),th('S','S'),th('L','L'),th('A','A'),th('H','H'),th('P','P'),th('Total','tot'),
+              ce('th',null,'Dicts'),ce('th',null,'Profil')
+            )),
+            ce('tbody',null,
+              sorted.map(el=>{
+                const stats=getElStats(el.id);
+                const exp=t4xp===el.id;
+                const evo=exp?getElEvo(el.id):null;
+                const totV=stats?tot(stats.totals):0;
+                const c2=stats?clr(stats.avg,'P3','Moyen'):null;
+                const rows=[
+                  ce('tr',{key:el.id,onClick:()=>st4xp(exp?null:el.id)},
+                    ce('td',null,ce('div',{className:'row',style:{gap:6}},
+                      c2&&ce('span',{className:'dot',style:{background:clrC(c2)}}),el.nom
+                    )),
+                    ...CK.map(k=>ce('td',{key:k,style:{color:CC[k].c,fontFamily:'JetBrains Mono',fontWeight:600}},stats?stats.totals[k]:'-')),
+                    ce('td',{style:{fontFamily:'JetBrains Mono',fontWeight:700}},totV),
+                    ce('td',null,stats?stats.count:0),
+                    ce('td',null,(el.profiles||[]).slice(0,2).map(k=>ce('span',{key:k,className:'ptag',style:{fontSize:'.62rem'}},pLabel(k).slice(0,5))).concat((el.profiles||[]).length>2?[ce('span',{key:'m',className:'ptag'},'…')]:[] ))
+                  )
+                ];
+                if (exp&&evo) rows.push(
+                  ce('tr',{key:el.id+'-x'},
+                    ce('td',{colSpan:9,style:{padding:'10px 16px',background:'var(--bl)'}},
+                      ce('div',{className:'chart-title'},el.nom+' — évolution par type d\'erreur'),
+                      evo.length>=2
+                        ?ce(LineChart,{series:CK.map(k=>({name:k,vals:evo.map(e=>e[k]),color:CC[k].c})),labels:evo.map(e=>e.label),h:130})
+                        :ce('p',{className:'xt gt',style:{padding:8}},'2 dictées minimum pour le graphique')
+                    )
+                  )
+                );
+                return rows;
+              }).flat()
+            ),
+            ce('tfoot',null,ce('tr',null,
+              ce('td',null,'CLASSE TOTAUX'),
+              ...CK.map(k=>{ const v=eleves.reduce((s,el)=>{ const st=getElStats(el.id); return s+(st?st.totals[k]:0); },0); return ce('td',{key:k,style:{color:CC[k].c,fontFamily:'JetBrains Mono'}},v); }),
+              ce('td',{style:{fontFamily:'JetBrains Mono'}},eleves.reduce((s,el)=>{ const st=getElStats(el.id); return s+(st?tot(st.totals):0); },0)),
+              ce('td',null,analyses.length),ce('td',null)
+            ))
+          )
+        ),
+        ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
+          ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Exporter PDF')
+        )
+      );
+    }
+
+    /* ── Sous-onglet 2 : Classe ── */
+    function S2() {
+      const classEvo=getClassEvo();
+      const totByType=CK.reduce((acc,k)=>{ acc[k]=eleves.reduce((s,el)=>{ const st=getElStats(el.id); return s+(st?st.totals[k]:0); },0); return acc; },{});
+      const maxType=Math.max(1,...CK.map(k=>totByType[k]));
+      if (!analyses.length) return ce('div',{className:'empty'},ce('div',{className:'ei'},'📊'),ce('p',null,'Aucune analyse disponible'));
+      return ce('div',null,
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},'🏫 Répartition des erreurs — Classe entière',ce('span',{className:'sub'},analyses.length+' analyses · '+dictees.length+' dictées')),
+          ce('div',{className:'sg'},
+            ...CK.map(k=>ce('div',{key:k,className:'sb2',style:{background:CC[k].b}},
+              ce('div',{className:'sbv',style:{color:CC[k].c}},totByType[k]),
+              ce('div',{className:'sbl',style:{color:CC[k].c}},CC[k].l)
+            ))
+          ),
+          ce('div',{className:'col mt12',style:{gap:6}},
+            ...CK.map(k=>ce('div',{key:k,className:'row',style:{gap:8}},
+              ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c,width:30,justifyContent:'center',flexShrink:0}},k),
+              HBar(totByType[k],maxType,CC[k].c),
+              ce('span',{className:'mn xt',style:{color:CC[k].c,width:32,textAlign:'right',flexShrink:0}},totByType[k])
+            ))
+          ),
+          ce(DonutChart,{data:CK.map(k=>({v:totByType[k],c:CC[k].c})),sz:110})
+        ),
+        classEvo.length>0&&ce('div',{className:'chart-box'},
+          ce('div',{className:'chart-title'},'📈 Évolution classe — moyenne erreurs par dictée'),
+          ce(BarChart,{data:classEvo})
+        ),
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},'🚨 Top 3 élèves avec le plus d\'erreurs par type'),
+          ...CK.map(k=>{
+            const ranked=[...eleves].map(el=>{ const st=getElStats(el.id); return {el,v:st?st.totals[k]:0}; }).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,3);
+            if (!ranked.length) return null;
+            return ce('div',{key:k,className:'mb10'},
+              ce('div',{className:'row mb4',style:{gap:6}},ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c}},CC[k].l+' ('+k+')')),
+              ...ranked.map((r,i)=>ce('div',{key:r.el.id,className:'row',style:{gap:8,marginBottom:4}},
+                ce('span',{className:'mn xt',style:{width:16,color:CC[k].c,fontWeight:700}},(i+1)+'.'),
+                ce('span',{style:{flex:1,fontSize:'.82rem',fontWeight:600}},r.el.nom),
+                HBar(r.v,ranked[0].v,CC[k].c),
+                ce('span',{className:'mn xt',style:{color:CC[k].c,width:24,textAlign:'right',flexShrink:0}},r.v)
+              ))
+            );
+          }).filter(Boolean)
+        ),
+        ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
+          ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Exporter PDF')
+        )
+      );
+    }
+
+    /* ── Sous-onglet 3 : Évolution ── */
+    function S3() {
+      const isClass=t4evo==='';
+      const el=!isClass?eleves.find(e=>e.id===t4evo):null;
+      const evo=isClass?getClassEvo():el?getElEvo(el.id):[];
+      const labels=evo.map(e=>e.label);
+      const seriesTotal=[{name:'Total',vals:evo.map(e=>e.total||0),color:'var(--blue)'}];
+      const seriesByType=t4ck.map(k=>({name:CC[k].l,vals:evo.map(e=>e[k]||0),color:CC[k].c}));
+      return ce('div',null,
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},'📈 Progression de'),
+          ce('select',{className:'inp sel',defaultValue:t4evo,onChange:ev=>st4evo(ev.target.value)},
+            ce('option',{value:''},'Classe entière'),
+            ...eleves.map(el2=>ce('option',{key:el2.id,value:el2.id},el2.nom))
+          ),
+          el&&profileTags(el)
+        ),
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},'Filtrer les types d\'erreurs'),
+          ce('div',{className:'lgd'},
+            ...CK.map(k=>ce('div',{key:k,className:'lgdi'+(t4ck.includes(k)?'':' off'),
+              style:{background:t4ck.includes(k)?CC[k].b:'white',color:CC[k].c,border:'1.5px solid '+(t4ck.includes(k)?CC[k].c:'var(--bdr)')},
+              onClick:()=>st4ck(p=>p.includes(k)?p.filter(x=>x!==k):[...p,k])},
+              ce('div',{className:'lgdd',style:{background:CC[k].c}}),k,' ',CC[k].l
+            ))
+          )
+        ),
+        evo.length>0&&ce('div',null,
+          ce('div',{className:'chart-box'},
+            ce('div',{className:'chart-title'},'Total erreurs — '+(isClass?'Classe entière':el&&el.nom)),
+            ce(LineChart,{series:seriesTotal,labels})
+          ),
+          t4ck.length>0&&ce('div',{className:'chart-box'},
+            ce('div',{className:'chart-title'},'Évolution par type — '+(isClass?'Classe entière':el&&el.nom)),
+            ce(LineChart,{series:seriesByType,labels,h:190}),
+            ce('div',{className:'lgd mt8'},
+              ...seriesByType.map(s=>ce('div',{key:s.name,className:'lgdi',style:{color:s.color,border:'1.5px solid '+s.color,background:'white'}},
+                ce('div',{className:'lgdd',style:{background:s.color}}),s.name
+              ))
+            )
+          )
+        ),
+        evo.length===0&&ce('div',{className:'empty'},ce('div',{className:'ei'},'📈'),ce('p',null,'Pas encore de données sur cette sélection')),
+        ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
+          ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Exporter PDF')
+        )
+      );
+    }
+
+    return ce('div',null,
+      ce('div',{className:'stnav no-print'},
+        ...["Vue d'ensemble","Par élève","Classe","Évolution"].map((n,i)=>ce('button',{key:i,className:'stbtn'+(t4sub===i?' on':''),onClick:()=>st4sub(i)},n))
+      ),
+      t4sub===0&&S0(),
+      t4sub===1&&S1(),
+      t4sub===2&&S2(),
+      t4sub===3&&S3()
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════
+     T5 — OUTILS
+  ══════════════════════════════════════════════════════ */
+  function T5() {
+    return ce('div',null,
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'🔗 Outils connectés'),
+        ce('div',{className:'infob infob-b mb10'},'Ces outils partagent les mêmes données élèves/dictées via localStorage. Ouvrez-les depuis le même navigateur.'),
+        ce('div',{className:'col',style:{gap:10}},
+          ce('div',{className:'li'},
+            ce('div',{className:'col f1',style:{gap:2}},
+              ce('span',{style:{fontWeight:700,fontSize:'.87rem'}},'✏️ Créateur d\'exercices CM1/CM2'),
+              ce('span',{className:'xt gt'},'Génère des exercices personnalisés par type d\'erreur et profil élève, avec export PDF')
+            ),
+            ce('a',{href:'createur-exercices-cm1.html',target:'_blank',className:'btn bp bsm'},'Ouvrir →')
+          ),
+          ce('div',{className:'li'},
+            ce('div',{className:'col f1',style:{gap:2}},
+              ce('span',{style:{fontWeight:700,fontSize:'.87rem'}},'📖 Créateur de dictées CM1/CM2'),
+              ce('span',{className:'xt gt'},'Crée des dictées progressives ciblant les erreurs récurrentes de la classe')
+            ),
+            ce('a',{href:'createur-dictees-cm1.html',target:'_blank',className:'btn bp bsm'},'Ouvrir →')
+          )
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'🤖 Le Chat Mistral — Agent spécialisé'),
+        ce('div',{className:'infob infob-b mb12'},'Copiez un prompt ci-dessous, ouvrez Le Chat Mistral, collez-le en instruction système pour créer votre agent pédagogique personnel.'),
+        ce('div',{className:'col',style:{gap:12}},
+          ce('div',{className:'card',style:{background:'var(--cream)',padding:'12px'}},
+            ce('div',{className:'ch',style:{marginBottom:8}},'Prompt — Créateur d\'exercices'),
+            ce('pre',{className:'prompt'},PROMPT_EXOS),
+            ce('div',{className:'row mt8'},
+              ce('button',{className:'btn bg bsm',onClick:()=>{ try{navigator.clipboard.writeText(PROMPT_EXOS);msg('Prompt copié !');}catch(e){msg('Copie manuelle requis','inf');} }},'📋 Copier'),
+              ce('a',{href:'https://chat.mistral.ai',target:'_blank',className:'btn bo bsm'},'Ouvrir Le Chat →')
+            )
+          ),
+          ce('div',{className:'card',style:{background:'var(--cream)',padding:'12px'}},
+            ce('div',{className:'ch',style:{marginBottom:8}},'Prompt — Créateur de dictées'),
+            ce('pre',{className:'prompt'},PROMPT_DICT),
+            ce('div',{className:'row mt8'},
+              ce('button',{className:'btn bg bsm',onClick:()=>{ try{navigator.clipboard.writeText(PROMPT_DICT);msg('Prompt copié !');}catch(e){msg('Copie manuelle requis','inf');} }},'📋 Copier'),
+              ce('a',{href:'https://chat.mistral.ai',target:'_blank',className:'btn bo bsm'},'Ouvrir Le Chat →')
+            )
+          )
+        )
+      )
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════
+     T6 — CONFIG
+  ══════════════════════════════════════════════════════ */
+  function T6() {
+    const p=cfg.provider||'mistral';
+    return ce('div',null,
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'🤖 Fournisseur d\'IA'},
+        ce('div',{className:'col'},
+          ce('select',{className:'inp sel',defaultValue:p,onChange:ev=>sc(prev=>Object.assign({},prev,{provider:ev.target.value}))},
+            Object.entries(AI_PROV).map(([k,v])=>ce('option',{key:k,value:k},v.label))
+          ),
+          p==='mistral'&&ce('div',{className:'col'},
+            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Clé API Mistral'),
+            ce('input',{key:'mk',className:'inp',type:'password',placeholder:'sk-…',defaultValue:cfg.mk||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{mk:ev.target.value}))})
+          ),
+          p==='openai'&&ce('div',{className:'col'},
+            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Clé API OpenAI'),
+            ce('input',{key:'ok',className:'inp',type:'password',placeholder:'sk-…',defaultValue:cfg.openaiKey||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{openaiKey:ev.target.value}))})
+          ),
+          p==='custom'&&ce('div',{className:'col'},
+            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'URL de l\'API'),
+            ce('input',{key:'cu',className:'inp',placeholder:'https://api.xxx.com/v1/chat/completions',defaultValue:cfg.customUrl||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customUrl:ev.target.value}))}),
+            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Clé API'),
+            ce('input',{key:'ck2',className:'inp',type:'password',placeholder:'sk-…',defaultValue:cfg.customKey||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customKey:ev.target.value}))}),
+            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Modèle Vision (OCR photos)'},
+            ce('input',{key:'cvm',className:'inp',placeholder:'ex: gpt-4o, pixtral-12b-2409',defaultValue:cfg.customVModel||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customVModel:ev.target.value}))})
+          )
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'💾 Sauvegarde & Restauration'),
+        ce('div',{className:'infob infob-y mb10'},'⚠️ localStorage peut être vidé si le cache est effacé. Exportez régulièrement et sauvegardez sur OneDrive.'),
+        ce('div',{className:'col',style:{gap:8}},
+          ce('button',{className:'btn bp',onClick:exportJSON},'⬇️ Exporter JSON (sauvegarde OneDrive)'),
+          ce('label',{className:'btn bo',style:{cursor:'pointer'}},
+            ce('input',{type:'file',accept:'.json',style:{display:'none'},onChange:ev=>{ if(ev.target.files&&ev.target.files[0])importJSON(ev.target.files[0]); }}),
+            '⬆️ Importer JSON (restauration)'
+          )
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📊 Résumé des données'),
+        ce('div',{className:'sg',style:{gridTemplateColumns:'repeat(3,1fr)'}},
+          ce('div',{className:'sb2',style:{background:'var(--bl)'}},ce('div',{className:'sbv',style:{color:'var(--blue)'}},eleves.length),ce('div',{className:'sbl',style:{color:'var(--blue)'}},'ÉLÈVES')),
+          ce('div',{className:'sb2',style:{background:'var(--lb)'}},ce('div',{className:'sbv',style:{color:'var(--lc)'}},dictees.length),ce('div',{className:'sbl',style:{color:'var(--lc)'}},'DICTÉES')),
+          ce('div',{className:'sb2',style:{background:'var(--hb)'}},ce('div',{className:'sbv',style:{color:'var(--hc)'}},analyses.length),ce('div',{className:'sbl',style:{color:'var(--hc)'}},'ANALYSES'))
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'⚠️ Zone dangereuse'),
+        ce('button',{className:'btn br',onClick:()=>{
+          if (window.confirm('ATTENTION : Supprimer TOUTES les données définitivement ?\nFaites d\'abord une sauvegarde JSON !')) {
+            se([]); sd([]); sa([]); msg('Toutes les données supprimées','err');
+          }
+        }},'🗑️ Supprimer toutes les données')
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'ℹ️ À propos'),
+        ce('div',{className:'col',style:{gap:4}},
+          ce('span',{className:'xt gt'},'La Plume Rouge v'+VER),
+          ce('span',{className:'xt gt'},'Hébergement : GitHub Pages · Données : localStorage navigateur'),
+          ce('span',{className:'xt gt'},'Phase 1 (test) — Migration Supabase + Auth prévue pour le lancement SaaS'),
+          ce('span',{className:'xt gt'},'La Plume Rouge est un outil créé par Alain Burgun, enseignant à l'École Vauban Luxembourg (AEFE), à partir d'une idée née en classe en 2025.')
+        )
+      )
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════
+     RENDU PRINCIPAL
+  ══════════════════════════════════════════════════════ */
+  const TABS = ['① Élèves','② Dictées','③ Analyser','④ Stats','⑤ Outils','⑥ Config'];
+  return ce('div',{className:'app'},
+    ce('div',{className:'hdr'},
+      ce('div',{className:'hic'},'🖊️'),
+      ce('div',null,
+        ce('h1',null,'La Plume Rouge'),
+        ce('div',{className:'hsub'},'CM1/CM2 · par Alain Burgun')
+      ),
+      ce('span',{className:'hv'},'v'+VER)
+    ),
+    ce('div',{className:'tnav no-print'},
+      ...TABS.map((t,i)=>ce('button',{key:i,className:'tbtn'+(tab===i?' on':''),onClick:()=>stab(i)},t))
+    ),
+    tab===0&&T1(),
+    tab===1&&T2(),
+    tab===2&&T3(),
+    tab===3&&T4(),
+    tab===4&&T5(),
+    tab===5&&T6(),
+    toast&&ce('div',{className:'toast '+(toast.tp==='err'?'terr':toast.tp==='inf'?'tinf':'tok')},toast.m)
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(ce(App,null));
+</script>
+</body>
+</html>
