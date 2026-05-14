@@ -567,7 +567,7 @@ function App() {
       ce('div',{className:'card'},
         ce('div',{className:'ch'},'📝 Nouvelle dictée'),
         ce('div',{key:t2key,className:'col'},
-          ce('input',{className:'inp',placeholder:'Titre de la dictée…',defaultValue:'',onChange:ev=>st2tit(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')add();}}),
+          ce('input',{className:'inp',placeholder:'Titre de la dictée...',defaultValue:'',onChange:ev=>st2tit(ev.target.value),onKeyDown:ev=>{if(ev.key==='Enter')add();}}),
           ce('div',{className:'roww'},
             ce('input',{type:'date',className:'inp sel f1',style:{minWidth:130},defaultValue:'',onChange:ev=>st2dat(ev.target.value)}),
             ce('select',{className:'inp sel',style:{flex:1},defaultValue:'P1',onChange:ev=>st2per(ev.target.value)},
@@ -677,7 +677,7 @@ function App() {
             ...t3ph.map(ph=>ce('div',{key:ph.id,className:'pthumb'},
               ce('img',{src:ph.dataUrl,alt:''}),
               ce('div',{className:'pstat ps-'+ph.status},
-                ph.status==='ready'?'Prêt':ph.status==='analyzing'?'⏳…':ph.status==='done'?'✓ '+((ph.errors&&ph.errors.length)||0):'✗ Erreur'
+                ph.status==='ready'?'Prêt':ph.status==='analyzing'?'⏳...':ph.status==='done'?'✓ '+((ph.errors&&ph.errors.length)||0):'✗ Erreur'
               ),
               ce('button',{className:'pdel',onClick:()=>st3ph(p=>p.filter(x=>x.id!==ph.id))},'✕')
             ))
@@ -685,7 +685,7 @@ function App() {
           ce('div',{className:'row mt10'},
             ce('button',{className:'btn bp',onClick:analyzeAll,disabled:t3busy||!canAna||!aiKey},
               t3busy?ce('span',{className:'spin'}):'🔍',
-              t3busy?' Analyse en cours…':' Analyser '+t3ph.filter(p=>p.status==='ready'||p.status==='error').length+' photo(s)'
+              t3busy?' Analyse en cours...':' Analyser '+t3ph.filter(p=>p.status==='ready'||p.status==='error').length+' photo(s)'
             ),
             !aiKey&&ce('span',{className:'xt',style:{color:'#B91C1C',marginLeft:4}},'⚠️ Clé API manquante — onglet ⑥')
           )
@@ -1030,18 +1030,18 @@ function App() {
           ),
           p==='mistral'&&ce('div',{className:'col'},
             ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Clé API Mistral'),
-            ce('input',{key:'mk',className:'inp',type:'password',placeholder:'sk-…',defaultValue:cfg.mk||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{mk:ev.target.value}))})
+            ce('input',{key:'mk',className:'inp',type:'password',placeholder:'sk-...',defaultValue:cfg.mk||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{mk:ev.target.value}))})
           ),
           p==='openai'&&ce('div',{className:'col'},
             ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Clé API OpenAI'),
-            ce('input',{key:'ok',className:'inp',type:'password',placeholder:'sk-…',defaultValue:cfg.openaiKey||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{openaiKey:ev.target.value}))})
+            ce('input',{key:'ok',className:'inp',type:'password',placeholder:'sk-...',defaultValue:cfg.openaiKey||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{openaiKey:ev.target.value}))})
           ),
           p==='custom'&&ce('div',{className:'col'},
             ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'URL de l\'API'),
             ce('input',{key:'cu',className:'inp',placeholder:'https://api.xxx.com/v1/chat/completions',defaultValue:cfg.customUrl||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customUrl:ev.target.value}))}),
             ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Clé API'),
-            ce('input',{key:'ck2',className:'inp',type:'password',placeholder:'sk-…',defaultValue:cfg.customKey||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customKey:ev.target.value}))}),
-            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Modèle Vision (OCR photos)'},
+            ce('input',{key:'ck2',className:'inp',type:'password',placeholder:'sk-...',defaultValue:cfg.customKey||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customKey:ev.target.value}))}),
+            ce('label',{className:'xt gt mt4',style:{fontWeight:700}},'Modèle Vision (OCR photos)'),
             ce('input',{key:'cvm',className:'inp',placeholder:'ex: gpt-4o, pixtral-12b-2409',defaultValue:cfg.customVModel||'',onBlur:ev=>sc(p2=>Object.assign({},p2,{customVModel:ev.target.value}))})
           )
         )
