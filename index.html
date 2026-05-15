@@ -1277,7 +1277,7 @@ function App() {
           ce('div',{className:'infob infob-b mb10'},'Sélectionnez une dictée. Le compilateur classe automatiquement les élèves selon leurs 2 types d\'erreurs dominants. Ajustez les groupes puis exportez vers votre agent IA.'),
           ce('div',{className:'row',style:{flexWrap:'wrap',gap:8}},
             ce('select',{className:'inp sel f1',defaultValue:selDict4,
-              onChange:ev=>setSelDict4(ev.target.value)},
+              onChange:ev=>{ const v=ev.target.value; setSelDict4(v); setGroups(computeGroups(v,eleves,analyses)); }},
               ce('option',{value:''},'— Choisir une dictée —'),
               ...dictees.map(d=>ce('option',{key:d.id,value:d.id},d.titre+' · '+d.date))
             ),
