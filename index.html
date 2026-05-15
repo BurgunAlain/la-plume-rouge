@@ -950,43 +950,8 @@ function App() {
      T4 — STATS (4 sous-onglets)
   ══════════════════════════════════════════════════════ */
   function T4() {
-    /* ── Groupement intelligent ── */
-    const buildGroups = (dicteeId) => {
-      const anals = analyses.filter(a=>a.dicteeId===dicteeId);
-      const groups = {};
-      eleves.forEach(el=>{
-        const anal = anals.find(a=>a.eleveId===el.id);
-        let top2;
-        if (!anal || !(anal.erreurs||[]).length) {
-          // Pas d'erreurs : approfondissement sur 2 types aléatoires
-          top2 = ['S','A'];
-        } else {
-          const c = cnt(anal.erreurs||[]);
-          const sorted = CK.slice().sort((a,b)=>c[b]-c[a]);
-          // Check for equality among top types
-          const vals = sorted.map(k=>c[k]);
-          if (vals[0]===0) { top2=['S','A']; }
-          else if (vals[0]===vals[1]&&vals[1]===vals[2]&&vals[2]>0) {
-            // 3-way tie: take first 2
-            top2 = sorted.slice(0,2);
-          } else {
-            top2 = sorted.slice(0,2).filter(k=>c[k]>0);
-            if (top2.length<2) top2 = [top2[0]||'S', sorted[2]||'A'];
-          }
-        }
-        const groupKey = top2.sort().join('+');
-        const isZero = !anal || !(anal.erreurs||[]).length;
-        if (!groups[groupKey]) groups[groupKey] = {types:top2.sort(),remed:[],appro:[]};
-        if (isZero) groups[groupKey].appro.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
-        else groups[groupKey].remed.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
-      });
-      return groups;
-    };
 
-    useEffect(()=>{
-      if (selDict4) setGroups(buildGroups(selDict4));
-      else setGroups({});
-    },[selDict4,analyses,eleves]);
+
 
     const moveEleve = (eleveId, fromKey, fromCol, toKey, toCol) => {
       setGroups(prev=>{
