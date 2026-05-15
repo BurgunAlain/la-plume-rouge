@@ -996,30 +996,30 @@ function App() {
       const d = dictees.find(x=>x.id===selDict4);
       if (!d||!Object.keys(groups).length){ msg('Sélectionnez une dictée avec des analyses','err'); return; }
       const rec = getRecurring(selDict4);
-      let bloc = `DICTÉE : ${d.titre} — ${d.periode} — ${d.difficulte}\n`;
-      bloc += `CLASSE : ${eleves.length} élèves — ${analyses.filter(a=>a.dicteeId===selDict4).length} analyses\n`;
+      let bloc = 'DICTÉE : '+d.titre+' — '+d.periode+' — '+d.difficulte+'\n';
+      bloc += 'CLASSE : '+eleves.length+' élèves — '+analyses.filter(a=>a.dicteeId===selDict4).length+' analyses\n';
       if (rec.length>0){
-        bloc += `MOTS FAUTIFS FRÉQUENTS : ${rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')}\n`;
+        bloc += 'MOTS FAUTIFS FRÉQUENTS : '+rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')+'\n';
       }
-      bloc += `MOTS FAUTIFS À RETRAVAILLER : [oui / non — à préciser]\n\n`;
-      bloc += `PARAMÈTRES EXERCICES :\n`;
-      bloc += `- Formes souhaitées : [à préciser : compléter, relier, entourer, écrire, QCM...]\n`;
-      bloc += `- Nombre d'exercices par type : [1 à 4]\n`;
-      bloc += `- Longueur : [nb d'items]\n`;
-      bloc += `- Correction : [même feuille / page séparée / HTML uniquement]\n\n`;
-      bloc += `GROUPES :\n`;
+      bloc += 'MOTS FAUTIFS À RETRAVAILLER : [oui / non — à préciser]\n\n';
+      bloc += 'PARAMÈTRES EXERCICES :\n';
+      bloc += '- Formes souhaitées : [à préciser : compléter, relier, entourer, écrire, QCM...]\n';
+      bloc += '- Nombre d\'exercices par type : [1 à 4]\n';
+      bloc += '- Longueur : [nb d\'items]\n';
+      bloc += '- Correction : [même feuille / page séparée / HTML uniquement]\n\n';
+      bloc += 'GROUPES :\n';
       Object.entries(groups).forEach(([key,g])=>{
         if (g.remed.length>0){
-          bloc += `\nGROUPE ${key} — REMÉDIATION (${g.remed.length} élève(s))\n`;
-          bloc += `Élèves : ${g.remed.map(e=>e.nom).join(', ')}\n`;
+          bloc += '\nGROUPE '+key+' — REMÉDIATION ('+g.remed.length+' élève(s))\n';
+          bloc += 'Élèves : '+g.remed.map(e=>e.nom).join(', ')+'\n';
           const profs=g.remed.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
-          bloc += `Profils particuliers : ${profs.length>0?profs.join(', '):'aucun'}\n`;
+          bloc += 'Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
         }
         if (g.appro.length>0){
-          bloc += `\nGROUPE ${key} — APPROFONDISSEMENT (${g.appro.length} élève(s))\n`;
-          bloc += `Élèves : ${g.appro.map(e=>e.nom).join(', ')}\n`;
+          bloc += '\nGROUPE '+key+' — APPROFONDISSEMENT ('+g.appro.length+' élève(s))\n';
+          bloc += 'Élèves : '+g.appro.map(e=>e.nom).join(', ')+'\n';
           const profs=g.appro.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
-          bloc += `Profils particuliers : ${profs.length>0?profs.join(', '):'aucun'}\n`;
+          bloc += 'Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
         }
       });
       try { navigator.clipboard.writeText(bloc); msg('Bloc copié — collez dans votre agent IA !'); }
@@ -1367,28 +1367,28 @@ function App() {
       const d=dictees.find(x=>x.id===exDictee);
       if (!d) return '';
       const rec=getRecurring(exDictee);
-      let bloc=`DICTÉE : ${d.titre} — ${d.periode} — ${d.difficulte}\n`;
-      bloc+=`CLASSE : ${eleves.length} élèves — ${analyses.filter(a=>a.dicteeId===exDictee).length} analyses\n`;
-      if (rec.length>0) bloc+=`MOTS FAUTIFS FRÉQUENTS : ${rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')}\n`;
-      bloc+=`MOTS FAUTIFS À RETRAVAILLER : ${exMotsFaut?'oui':'non'}\n\n`;
-      bloc+=`PARAMÈTRES EXERCICES :\n`;
-      bloc+=`- Formes souhaitées : ${exFormes.map(k=>FORMES.find(f=>f.k===k)&&FORMES.find(f=>f.k===k).l).filter(Boolean).join(', ')}\n`;
-      bloc+=`- Nombre d'exercices par type : ${exNb}\n`;
-      bloc+=`- Longueur : ${exItems} items\n`;
-      bloc+=`- Correction : ${exCorrec==='meme'?'même feuille':'page séparée'}\n\n`;
+      let bloc='DICTÉE : '+d.titre+' — '+d.periode+' — '+d.difficulte+'\n';
+      bloc+='CLASSE : '+eleves.length+' élèves — '+analyses.filter(a=>a.dicteeId===exDictee).length+' analyses\n';
+      if (rec.length>0) bloc+='MOTS FAUTIFS FRÉQUENTS : '+rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')+'\n';
+      bloc+='MOTS FAUTIFS À RETRAVAILLER : '+(exMotsFaut?'oui':'non')+'\n\n';
+      bloc+='PARAMÈTRES EXERCICES :\n';
+      bloc+='- Formes souhaitées : '+exFormes.map(k=>FORMES.find(f=>f.k===k)&&FORMES.find(f=>f.k===k).l).filter(Boolean).join(', ')+'\n';
+      bloc+='- Nombre d\'exercices par type : '+exNb+'\n';
+      bloc+='- Longueur : '+exItems+' items\n';
+      bloc+='- Correction : '+(exCorrec==='meme'?'même feuille':'page séparée')+'\n\n';
       bloc+='GROUPES :\n';
       Object.entries(exGroups).forEach(([key,g])=>{
         if (g.remed.length>0){
-          bloc+=`\nGROUPE ${key} — REMÉDIATION (${g.remed.length} élève(s))\n`;
-          bloc+=`Élèves : ${g.remed.map(e=>e.nom).join(', ')}\n`;
+          bloc+='\nGROUPE '+key+' — REMÉDIATION ('+g.remed.length+' élève(s))\n';
+          bloc+='Élèves : '+g.remed.map(e=>e.nom).join(', ')+'\n';
           const profs=g.remed.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
-          bloc+=`Profils particuliers : ${profs.length>0?profs.join(', '):'aucun'}\n`;
+          bloc+='Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
         }
         if (g.appro.length>0){
-          bloc+=`\nGROUPE ${key} — APPROFONDISSEMENT (${g.appro.length} élève(s))\n`;
-          bloc+=`Élèves : ${g.appro.map(e=>e.nom).join(', ')}\n`;
+          bloc+='\nGROUPE '+key+' — APPROFONDISSEMENT ('+g.appro.length+' élève(s))\n';
+          bloc+='Élèves : '+g.appro.map(e=>e.nom).join(', ')+'\n';
           const profs=g.appro.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
-          bloc+=`Profils particuliers : ${profs.length>0?profs.join(', '):'aucun'}\n`;
+          bloc+='Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
         }
       });
       return bloc;
@@ -1430,18 +1430,9 @@ function App() {
     const exportWord = () => {
       if (!exResult){ msg('Générez d\'abord les exercices','err'); return; }
       const d=dictees.find(x=>x.id===exDictee);
-      const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<style>
-body{font-family:Calibri,sans-serif;font-size:11pt;margin:2cm;}
-h1{font-size:14pt;color:#1A3C6E;border-bottom:2px solid #1A3C6E;padding-bottom:4px;}
-h2{font-size:12pt;color:#1A3C6E;margin-top:20px;}
-p{margin:6px 0;line-height:1.5;}
-.footer{margin-top:40px;font-size:8pt;color:#9CA3AF;text-align:center;}
-</style></head><body>
-<h1>${d?d.titre+' — '+d.periode:''}</h1>
-${exResult.replace(/\n/g,'<br>').replace(/#{1,3} ([^\n]+)/g,'<h2>$1</h2>')}
-<div class="footer">La Plume Rouge — créé par Alain Burgun · École Vauban Luxembourg (AEFE)</div>
-</body></html>`;
+      const titre2=d?d.titre+' — '+d.periode:'';
+      const body2=exResult.replace(/\n/g,'<br>').replace(/#{1,3} ([^\n]+)/g,'<h2>$1</h2>');
+      const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Calibri,sans-serif;font-size:11pt;margin:2cm;}h1{font-size:14pt;color:#1A3C6E;border-bottom:2px solid #1A3C6E;padding-bottom:4px;}h2{font-size:12pt;color:#1A3C6E;margin-top:20px;}p{margin:6px 0;line-height:1.5;}.footer{margin-top:40px;font-size:8pt;color:#9CA3AF;text-align:center;}</style></head><body><h1>'+titre2+'</h1>'+body2+'<div class="footer">La Plume Rouge — créé par Alain Burgun · École Vauban Luxembourg (AEFE)</div></body></html>';
       const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
       const url2=URL.createObjectURL(blob);
       const a=document.createElement('a');
@@ -1466,36 +1457,9 @@ ${exResult.replace(/\n/g,'<br>').replace(/#{1,3} ([^\n]+)/g,'<h2>$1</h2>')}
           htmlBody+=`<p>${inp}</p>`;
         }
       });
-      const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Exercices — ${d?d.titre:''}</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;background:#F5F2EC;color:#1A1A2E;padding:16px;}
-.card{background:white;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.07);}
-h1{font-size:1.2rem;color:#1A3C6E;margin-bottom:12px;}
-h2{font-size:1rem;color:#1A3C6E;margin:16px 0 8px;}
-h3{font-size:.95rem;color:#2A5298;margin:12px 0 6px;}
-p{line-height:1.7;margin:6px 0;}
-.blank{border:none;border-bottom:2px solid #1A3C6E;background:transparent;font-size:1rem;width:120px;padding:2px 4px;outline:none;}
-.blank.correct{border-color:#10B981;background:#D1FAE5;}
-.blank.wrong{border-color:#EF4444;background:#FEE2E2;}
-.btn{display:inline-block;padding:12px 24px;background:#1A3C6E;color:white;border:none;border-radius:9px;font-size:1rem;cursor:pointer;margin-top:16px;width:100%;}
-.footer{text-align:center;font-size:.75rem;color:#9CA3AF;margin-top:24px;}
-</style></head><body>
-<div class="card">
-<h1>Exercices — ${d?d.titre+' · '+d.periode:''}</h1>
-${htmlBody}
-<button class="btn" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
-</div>
-<div class="footer">La Plume Rouge · Alain Burgun · École Vauban Luxembourg (AEFE)</div>
-<script>
-function checkAnswer(el){
-  if(el.value.trim().length>2){el.classList.add('correct');el.classList.remove('wrong');}
-  else{el.classList.remove('correct');}
-}
-</script>
-</body></html>`;
+      const htmlTitle=d?d.titre:'';
+      const htmlPeriod=d?d.titre+' · '+d.periode:'';
+      const html='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Exercices — '+htmlTitle+'</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:16px;background:#F5F2EC;color:#1A1A2E;padding:16px;}.card{background:white;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.07);}h1{font-size:1.2rem;color:#1A3C6E;margin-bottom:12px;}h2{font-size:1rem;color:#1A3C6E;margin:16px 0 8px;}p{line-height:1.7;margin:6px 0;}.blank{border:none;border-bottom:2px solid #1A3C6E;background:transparent;font-size:1rem;width:120px;padding:2px 4px;outline:none;}.blank.correct{border-color:#10B981;background:#D1FAE5;}.btn{display:inline-block;padding:12px 24px;background:#1A3C6E;color:white;border:none;border-radius:9px;font-size:1rem;cursor:pointer;margin-top:16px;width:100%;}.footer{text-align:center;font-size:.75rem;color:#9CA3AF;margin-top:24px;}</style></head><body><div class="card"><h1>Exercices — '+htmlPeriod+'</h1>'+htmlBody+'<button class="btn" onclick="window.print()">Imprimer / PDF</button></div><div class="footer">La Plume Rouge · Alain Burgun · Ecole Vauban Luxembourg (AEFE)</div><script>function checkAnswer(el){if(el.value.trim().length>2){el.classList.add("correct");}else{el.classList.remove("correct");}}<\/script></body></html>';
       const blob=new Blob([html],{type:'text/html;charset=utf-8'});
       const url2=URL.createObjectURL(blob);
       const a=document.createElement('a');
