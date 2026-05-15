@@ -198,6 +198,176 @@ FORMAT DE RÉPONSE :
 4. Variante facilitée (profil DYS/difficulté)
 5. Variante enrichie (profil EIP/performant)`;
 
+const PROMPT_EXERCICES = `# PROMPT — Agent Exercices · La Plume Rouge
+*À coller en instruction système de votre agent IA (Mistral AI Studio, ChatGPT, Claude, Gemini, Copilot...)*
+
+---
+
+## IDENTITÉ
+
+Tu es un assistant pédagogique expert en langue française pour le Cycle 3 (CM1/CM2, élèves de 9 à 11 ans). Tu aides les enseignants à créer des exercices différenciés à partir des erreurs relevées dans les dictées de leurs élèves. Tu maîtrises parfaitement la grammaire, la conjugaison, le vocabulaire, l'orthographe et la syntaxe de la langue française, et tu les mobilises au service de la correction des 5 types d'erreurs suivants :
+
+- **S** — Son / phonétique (erreurs de correspondance phonème-graphème)
+- **H** — Homophone (confusion entre homophones grammaticaux ou lexicaux)
+- **L** — Lexique (mot mal orthographié)
+- **A** — Accord (accord en genre, nombre, sujet-verbe, participe passé)
+- **P** — Ponctuation (ponctuation manquante ou incorrecte, majuscule oubliée)
+
+Tu ne génères des exercices que sur ces 5 types d'erreurs. Tu n'interviens pas sur d'autres domaines sauf si l'enseignant le demande explicitement.
+
+---
+
+## PREMIER CONTACT
+
+À la toute première interaction avec un nouvel enseignant, tu te présentes brièvement et tu poses ces questions **en une seule fois** :
+
+1. Ton prénom et ta classe (CM1 / CM2 / les deux) ?
+2. As-tu des préférences de mise en page pour tes exercices ? (en-tête, logo, police, espacement, numérotation...)
+3. As-tu un canevas ou modèle d'exercice que tu utilises habituellement ? Si oui, décris-le ou colle-le.
+
+Tu mémorises toutes ces informations pour toute la suite des échanges. Tu ne les redemandes jamais sauf si l'enseignant dit explicitement **"changer mes préférences"** ou **"nouveau canevas"**.
+
+Par défaut, si l'enseignant n'a pas de préférences particulières : **pas de logo, pas d'en-tête, pas de nom d'élève sur l'exercice** — exercice d'entraînement simple et propre.
+
+---
+
+## DONNÉES REÇUES
+
+L'enseignant te transmet un bloc de données structuré copié depuis l'outil **La Plume Rouge**. Ce bloc contient toutes les informations nécessaires pour générer les exercices sans poser de questions supplémentaires :
+
+\`\`\`
+DICTÉE : [titre] — [période P1 à P5] — [difficulté : Facile / Moyen / Difficile]
+CLASSE : [nombre d'élèves] — [nombre d'analyses disponibles]
+MOTS FAUTIFS FRÉQUENTS : [mot](type) x[nb élèves], [mot](type) x[nb élèves]...
+MOTS FAUTIFS À RETRAVAILLER : [oui / non]
+
+PARAMÈTRES EXERCICES :
+- Formes souhaitées : [ex. compléter les blancs, entourer, relier...]
+- Nombre d'exercices par type : [1 à 4]
+- Longueur : [nb d'items par exercice]
+- Correction : [même feuille / page séparée / HTML uniquement]
+
+GROUPES :
+
+GROUPE [types ex. S+A] — REMÉDIATION ([nb] élèves)
+Élèves : [liste des prénoms]
+Profils particuliers : [ex. Emma (DYS), Tom (TDAH)] ou aucun
+
+GROUPE [types ex. S+A] — APPROFONDISSEMENT ([nb] élèves)
+Élèves : [liste des prénoms]
+Profils particuliers : [ex. Martin (EIP)] ou aucun
+
+GROUPE [types ex. H+L] — REMÉDIATION ([nb] élèves)
+Élèves : [liste des prénoms]
+Profils particuliers : [ex. Jade (allophone)] ou aucun
+
+[...autant de groupes que nécessaire]
+\`\`\`
+
+Si le bloc est incomplet ou absent, tu demandes poliment à l'enseignant de le fournir depuis La Plume Rouge avant de continuer.
+
+---
+
+## GÉNÉRATION DES EXERCICES
+
+Dès réception du bloc complet, tu génères directement les exercices **sans poser de questions supplémentaires**. Toutes les informations nécessaires sont dans le bloc.
+
+### Principe de regroupement
+Tu génères **un jeu d'exercices par combinaison unique de types d'erreurs ET d'objectif (remédiation/approfondissement)**. Chaque jeu porte en haut la liste des prénoms des élèves concernés.
+
+Exemples :
+- Martin, Léo, Silvia → groupe S+A remédiation → 1 jeu d'exercices S+A remédiation avec leurs 3 noms
+- Emma, Jules → groupe S+A approfondissement → 1 jeu d'exercices S+A approfondissement avec leurs 2 noms
+- Si Silvia est aussi classée en H → tu génères en plus un exercice H avec son nom, seul ou avec d'autres élèves en H
+
+### Calibrage de la difficulté
+Tu calibres chaque exercice selon **deux paramètres combinés** :
+
+- La **période** (P1 = début d'année → exercices très guidés, règle rappelée, nombreux exemples / P5 = fin d'année → exercices complexes, autonomie, mise en contexte)
+- L'**objectif** :
+  - **Remédiation** → on repart des bases, consignes simples, exemple résolu fourni, items courts
+  - **Approfondissement** → on va plus loin, justification demandée, règle à formuler, items complexes
+
+### Différenciation pour profils particuliers
+Pour chaque groupe contenant des élèves avec un profil particulier, tu génères **une variante adaptée** du même exercice, avec les noms de ces élèves en haut :
+
+| Profil | Adaptation |
+|--------|-----------|
+| DYS (dyslexie/dysorthographie) | Phrases très courtes, consigne en 1 phrase, espacement généreux, police sans serif recommandée (OpenDyslexic), pas de fond chargé, items peu nombreux |
+| TDAH | Exercices courts et variés, cases à cocher, étapes bien séparées, feedback immédiat dans la version HTML |
+| EIP / Performant | Justification demandée, règle à formuler par l'élève, exercices complexes avec mise en contexte riche |
+| Allophone | Vocabulaire simplifié, exemples concrets, traduction du mot-clé si possible, support visuel suggéré |
+| Lecteur en difficulté | Consigne en 1 phrase simple, exemple résolu bien visible, peu d'items, grande police recommandée |
+| Élève lent | Moins d'items, plus d'espace pour écrire, exercice découpé en étapes numérotées |
+
+Si plusieurs élèves d'un même groupe ont le même profil, tu génères une seule variante pour eux tous avec leurs noms.
+
+### Structure de chaque exercice
+Chaque exercice généré comprend obligatoirement :
+1. **Prénoms des élèves concernés** en haut (sauf préférence contraire de l'enseignant)
+2. **Titre** : type d'erreur travaillé (ex. "Exercice — Les accords")
+3. **Rappel de la règle** : 1 à 2 phrases maximum, formulées simplement
+4. **Exemple résolu** : 1 exemple fait avec la réponse visible
+5. **Corps de l'exercice** : les items selon la forme choisie dans le bloc
+6. **Correction** : selon le paramètre du bloc
+
+---
+
+## PROCESSUS DE VALIDATION ET FORMAT DE SORTIE
+
+### Étape 1 — Validation
+Après avoir généré tous les exercices, tu demandes :
+> *"Voici les exercices générés pour chaque groupe. Souhaites-tu ajuster quelque chose — modifier un exercice, déplacer un élève, changer la difficulté ?"*
+
+Tu attends la réponse. Si l'enseignant dit non ou valide → tu passes à l'étape 2.
+
+### Étape 2 — Format de sortie
+Tu demandes :
+> *"Sous quel format veux-tu ces exercices ?"*
+> - **📝 Texte éditable** — copier-coller dans Word, LibreOffice ou tout traitement de texte
+> - **🖨️ PDF imprimable** — code HTML/CSS optimisé pour impression, à ouvrir dans un navigateur et imprimer en PDF
+> - **📱 HTML interactif tablette** — page HTML autonome avec champs de saisie, correction automatique verte/rouge, optimisée iPad
+
+### Étape 3 — Génération du format choisi
+
+**Texte éditable :**
+Texte brut proprement mis en page, prêt à copier-coller. L'enseignant peut modifier avant d'imprimer.
+
+**PDF imprimable :**
+Code HTML/CSS complet optimisé pour l'impression (@media print). Inclut :
+- Prénoms des élèves en haut
+- Exercice mis en page proprement
+- Correction sur page séparée si choix de l'enseignant
+- Mention discrète *"La Plume Rouge"* en pied de page (sauf préférence contraire)
+
+**HTML interactif tablette :**
+Page HTML autonome optimisée pour iPad et tablettes. Inclut :
+- Champs de saisie adaptés au tactile (grande taille)
+- Bouton "Corriger" avec feedback immédiat vert (correct) / rouge (incorrect)
+- Affichage de la bonne réponse après validation
+- Design simple, lisible, sans distraction
+- Fonctionne sans connexion internet une fois la page ouverte
+
+---
+
+## RÈGLES GÉNÉRALES
+
+- Tu réponds toujours en **français**
+- Tu ne génères jamais d'exercice sans avoir reçu le bloc de données complet
+- Tu n'inventes pas de noms d'élèves — tu utilises uniquement ceux fournis dans le bloc
+- Tu signales si un type d'erreur est trop rare pour générer un exercice pertinent
+- Si l'enseignant dit **"refaire"** ou **"autre version"**, tu génères une variante différente
+- Si l'enseignant dit **"plus simple"** ou **"plus difficile"**, tu ajustes sans redemander les paramètres
+- Si l'enseignant dit **"changer mes préférences"**, tu reposes les questions du premier contact
+- Tu es bienveillant, pédagogique et concis dans tes échanges
+
+---
+
+*Prompt La Plume Rouge — créé par Alain Burgun, enseignant à l'École Vauban Luxembourg (AEFE) — 2025*
+*Compatible : Mistral AI Studio, ChatGPT, Claude, Gemini, Copilot et tout agent IA avec instructions système*
+`;
+
+
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const lget = (k,fb) => { try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(x){return fb;} };
 const lset = (k,v)  => { try{localStorage.setItem(k,JSON.stringify(v));}catch(x){} };
@@ -274,7 +444,7 @@ function App() {
   const [eleves,  se] = useState(()=>lget(LSK.e,[]));
   const [dictees, sd] = useState(()=>lget(LSK.d,[]));
   const [analyses,sa] = useState(()=>lget(LSK.a,[]));
-  const [cfg,     sc] = useState(()=>lget(LSK.c,{provider:'mistral',mk:'',openaiKey:'',customUrl:'',customKey:'',customVModel:''}));
+  const [cfg,     sc] = useState(()=>lget(LSK.c,{provider:'mistral',mk:'',openaiKey:'',customUrl:'',customKey:'',customVModel:'',agentExUrl:'',agentDiUrl:''}));
   const [tab,   stab] = useState(0);
   const [toast,stoast]= useState(null);
   /* T1 */
@@ -471,7 +641,7 @@ function App() {
     const saveEdit = () => {
       if (!t1en.trim()) return;
       se(p=>p.map(el=>el.id===t1edit?Object.assign({},el,{nom:t1en.trim(),profiles:t1ep,notes:t1eno}):el));
-      st1edit(null); msg('✅ Profil mis à jour');
+      st1edit(null); msg('Profil mis à jour');
     };
     const addEl = () => {
       const n=t1nom.trim(); if (!n) return;
@@ -480,6 +650,42 @@ function App() {
       st1nom(''); st1key(k=>k+1); msg(n+' ajouté(e)');
     };
     const toggleP = k => st1ep(p=>p.includes(k)?p.filter(x=>x!==k):[...p,k]);
+
+    const importExcel = async (file) => {
+      if (!file) return;
+      try {
+        const XLSX = await import('https://cdn.sheetjs.com/xlsx-0.20.1/package/xlsx.mjs');
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf);
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws,{defval:''});
+        let added=0, skipped=0;
+        rows.forEach(row=>{
+          const prenom=(row['Prénom']||row['prenom']||'').toString().trim();
+          const nom=(row['Nom']||row['nom']||'').toString().trim();
+          if (!prenom) return;
+          const fullName=prenom+(nom?' '+nom:'');
+          if (eleves.some(el=>el.nom.toLowerCase()===fullName.toLowerCase())){ skipped++; return; }
+          const profsRaw=(row['Profils']||row['profils']||'').toString();
+          const profiles=profsRaw.split(',').map(p=>p.trim().toLowerCase()).filter(p=>p!=='');
+          const notes=(row['Informations complémentaires']||row['informations']||'').toString().trim();
+          se(prev=>[...prev,{id:uid(),nom:fullName,profiles,notes}]);
+          added++;
+        });
+        msg(added+' élève(s) importé(s)'+(skipped>0?' · '+skipped+' ignoré(s) (doublon)':''));
+      } catch(ex){ msg('Erreur import : '+ex.message,'err'); }
+    };
+
+    const downloadModel = () => {
+      const csv = '\uFEFFPrénom,Nom,Niveau,Profils,Informations complémentaires\nEmma,Martin,CM1,"dys, tdah",Suivi orthophoniste 2x/semaine\nLucas,Bernard,CM2,perf,\n';
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href=url; a.download='modele-classe-laplumerouge.csv';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+      msg('Modèle téléchargé — ouvrez dans Excel');
+    };
 
     if (t1edit) {
       const el=eleves.find(e=>e.id===t1edit);
@@ -504,11 +710,11 @@ function App() {
             )
           )),
           ce('div',{className:'mt10'},
-            ce('label',{className:'xt gt mb4',style:{display:'block',fontWeight:700}},'Notes complémentaires'),
-            ce('textarea',{key:'eno-'+t1edit,className:'inp',defaultValue:t1eno,onChange:ev=>st1eno(ev.target.value),placeholder:'Orthophonie, bilingue, rejoint en P2, PAP en cours…'})
+            ce('label',{className:'xt gt mb4',style:{display:'block',fontWeight:700}},'Informations complémentaires'),
+            ce('textarea',{key:'eno-'+t1edit,className:'inp',defaultValue:t1eno,onChange:ev=>st1eno(ev.target.value),placeholder:'Orthophonie, bilingue, rejoint en P2, PAP en cours...'})
           ),
           ce('div',{className:'row mt12'},
-            ce('button',{className:'btn bp',onClick:saveEdit},'💾 Enregistrer'),
+            ce('button',{className:'btn bp',onClick:saveEdit},'Enregistrer'),
             ce('button',{className:'btn bg',onClick:()=>st1edit(null)},'Annuler')
           )
         )
@@ -525,9 +731,25 @@ function App() {
         )
       ),
       ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📥 Import classe'),
+        ce('div',{className:'infob infob-b mb10'},'Importez toute votre classe en une fois depuis un fichier CSV/Excel. Les doublons sont ignorés automatiquement.'),
+        ce('div',{className:'row',style:{flexWrap:'wrap',gap:8}},
+          ce('button',{className:'btn bg',onClick:downloadModel},'⬇️ Télécharger le modèle CSV'),
+          ce('label',{className:'btn bp',style:{cursor:'pointer'}},
+            ce('input',{type:'file',accept:'.csv,.xlsx,.xls',style:{display:'none'},
+              onChange:ev=>{ if(ev.target.files&&ev.target.files[0])importExcel(ev.target.files[0]); }}),
+            '📥 Importer ma classe'
+          )
+        ),
+        ce('div',{className:'mt8'},
+          ce('p',{className:'xt gt'},'Colonnes attendues : Prénom · Nom · Niveau · Profils (codes séparés par virgule) · Informations complémentaires'),
+          ce('p',{className:'xt gt mt4'},'Codes profils disponibles : dys, tdah, dysphasie, allophone, ldiff, gdiff, petitlect, moyenlect, bonlect, perf, visuels, consignes, manip, lent, autonome, progres, decroch')
+        )
+      ),
+      ce('div',{className:'card'},
         ce('div',{className:'ch'},'📋 Classe',ce('span',{className:'sub'},'('+eleves.length+' élève(s))')),
         eleves.length===0
-          ?ce('div',{className:'empty'},ce('div',{className:'ei'},'👦'),ce('p',null,'Aucun élève — commencez par en ajouter'))
+          ?ce('div',{className:'empty'},ce('div',{className:'ei'},'👦'),ce('p',null,'Aucun élève — ajoutez ou importez votre classe'))
           :eleves.map((el,i)=>{
               const stats=getElStats(el.id);
               return ce('div',{key:el.id,className:'li'},
@@ -543,7 +765,7 @@ function App() {
                   stats&&ce('span',{className:'xt gt mn',style:{marginRight:6}},tot(stats.totals)+' err.'),
                   ce('button',{className:'btn bo bsm',onClick:()=>openEdit(el)},'✏️'),
                   ce('button',{className:'btn br bsm',onClick:()=>{
-                    if (!window.confirm('Supprimer '+el.nom+' et toutes ses analyses ?')) return;
+                    if (!window.confirm('Supprimer '+el.nom+' ?')) return;
                     se(p=>p.filter(x=>x.id!==el.id)); sa(p=>p.filter(x=>x.eleveId!==el.id));
                     msg('Supprimé','inf');
                   }},'✕')
@@ -554,9 +776,6 @@ function App() {
     );
   }
 
-  /* ══════════════════════════════════════════════════════
-     T2 — DICTÉES
-  ══════════════════════════════════════════════════════ */
   function T2() {
     const add = () => {
       if (!t2tit.trim()){ msg('Titre requis','err'); return; }
@@ -728,36 +947,141 @@ function App() {
      T4 — STATS (4 sous-onglets)
   ══════════════════════════════════════════════════════ */
   function T4() {
+    /* ── Groupement intelligent ── */
+    const buildGroups = (dicteeId) => {
+      const anals = analyses.filter(a=>a.dicteeId===dicteeId);
+      const groups = {};
+      eleves.forEach(el=>{
+        const anal = anals.find(a=>a.eleveId===el.id);
+        let top2;
+        if (!anal || !(anal.erreurs||[]).length) {
+          // Pas d'erreurs : approfondissement sur 2 types aléatoires
+          top2 = ['S','A'];
+        } else {
+          const c = cnt(anal.erreurs||[]);
+          const sorted = CK.slice().sort((a,b)=>c[b]-c[a]);
+          // Check for equality among top types
+          const vals = sorted.map(k=>c[k]);
+          if (vals[0]===0) { top2=['S','A']; }
+          else if (vals[0]===vals[1]&&vals[1]===vals[2]&&vals[2]>0) {
+            // 3-way tie: take first 2
+            top2 = sorted.slice(0,2);
+          } else {
+            top2 = sorted.slice(0,2).filter(k=>c[k]>0);
+            if (top2.length<2) top2 = [top2[0]||'S', sorted[2]||'A'];
+          }
+        }
+        const groupKey = top2.sort().join('+');
+        const isZero = !anal || !(anal.erreurs||[]).length;
+        if (!groups[groupKey]) groups[groupKey] = {types:top2.sort(),remed:[],appro:[]};
+        if (isZero) groups[groupKey].appro.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
+        else groups[groupKey].remed.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
+      });
+      return groups;
+    };
 
-    /* ── Sous-onglet 0 : Vue d'ensemble ── */
-    function S0() {
+    const [selDict4, setSelDict4] = React.useState('');
+    const [groups, setGroups] = React.useState({});
+    const [moveMenu, setMoveMenu] = React.useState(null);
+
+    React.useEffect(()=>{
+      if (selDict4) setGroups(buildGroups(selDict4));
+      else setGroups({});
+    },[selDict4,analyses,eleves]);
+
+    const moveEleve = (eleveId, fromKey, fromCol, toKey, toCol) => {
+      setGroups(prev=>{
+        const next = JSON.parse(JSON.stringify(prev));
+        // Remove from source
+        next[fromKey][fromCol] = next[fromKey][fromCol].filter(e=>e.eleveId!==eleveId);
+        const el = eleves.find(e=>e.id===eleveId);
+        if (!el) return next;
+        const entry = {eleveId,nom:el.nom,profiles:el.profiles||[]};
+        // Add to target - create group if needed
+        if (!next[toKey]) next[toKey] = {types:toKey.split('+'),remed:[],appro:[]};
+        if (!next[toKey][toCol].some(e=>e.eleveId===eleveId))
+          next[toKey][toCol].push(entry);
+        // Clean empty groups
+        Object.keys(next).forEach(k=>{ if (!next[k].remed.length&&!next[k].appro.length) delete next[k]; });
+        return next;
+      });
+      setMoveMenu(null);
+    };
+
+    const addToGroup = (eleveId, groupKey, col) => {
+      const el = eleves.find(e=>e.id===eleveId);
+      if (!el) return;
+      setGroups(prev=>{
+        const next = JSON.parse(JSON.stringify(prev));
+        if (!next[groupKey]) next[groupKey]={types:groupKey.split('+'),remed:[],appro:[]};
+        if (!next[groupKey][col].some(e=>e.eleveId===eleveId))
+          next[groupKey][col].push({eleveId,nom:el.nom,profiles:el.profiles||[]});
+        return next;
+      });
+    };
+
+    const exportBloc = () => {
+      const d = dictees.find(x=>x.id===selDict4);
+      if (!d||!Object.keys(groups).length){ msg('Sélectionnez une dictée avec des analyses','err'); return; }
+      const rec = getRecurring(selDict4);
+      let bloc = `DICTÉE : ${d.titre} — ${d.periode} — ${d.difficulte}\n`;
+      bloc += `CLASSE : ${eleves.length} élèves — ${analyses.filter(a=>a.dicteeId===selDict4).length} analyses\n`;
+      if (rec.length>0){
+        bloc += `MOTS FAUTIFS FRÉQUENTS : ${rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')}\n`;
+      }
+      bloc += `MOTS FAUTIFS À RETRAVAILLER : [oui / non — à préciser]\n\n`;
+      bloc += `PARAMÈTRES EXERCICES :\n`;
+      bloc += `- Formes souhaitées : [à préciser : compléter, relier, entourer, écrire, QCM...]\n`;
+      bloc += `- Nombre d'exercices par type : [1 à 4]\n`;
+      bloc += `- Longueur : [nb d'items]\n`;
+      bloc += `- Correction : [même feuille / page séparée / HTML uniquement]\n\n`;
+      bloc += `GROUPES :\n`;
+      Object.entries(groups).forEach(([key,g])=>{
+        if (g.remed.length>0){
+          bloc += `\nGROUPE ${key} — REMÉDIATION (${g.remed.length} élève(s))\n`;
+          bloc += `Élèves : ${g.remed.map(e=>e.nom).join(', ')}\n`;
+          const profs=g.remed.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
+          bloc += `Profils particuliers : ${profs.length>0?profs.join(', '):'aucun'}\n`;
+        }
+        if (g.appro.length>0){
+          bloc += `\nGROUPE ${key} — APPROFONDISSEMENT (${g.appro.length} élève(s))\n`;
+          bloc += `Élèves : ${g.appro.map(e=>e.nom).join(', ')}\n`;
+          const profs=g.appro.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
+          bloc += `Profils particuliers : ${profs.length>0?profs.join(', '):'aucun'}\n`;
+        }
+      });
+      try { navigator.clipboard.writeText(bloc); msg('Bloc copié — collez dans votre agent IA !'); }
+      catch(e){ msg('Erreur copie','err'); }
+    };
+
+    /* ── All groups keys for move menu ── */
+    const allGroupKeys = [...new Set([...Object.keys(groups),...CK.flatMap(k1=>CK.filter(k2=>k2>k1).map(k2=>k1+'+'+k2))])];
+
+    /* ── Sub-tabs ── */
+    function S0() { /* Vue d'ensemble - unchanged */
       const el=t4el?eleves.find(e=>e.id===t4el):null;
       const stats=el?getElStats(el.id):null;
       const evo=el?getElEvo(el.id):null;
       const classEvo=getClassEvo();
       return ce('div',null,
         ce('div',{className:'card'},
-          ce('div',{className:'ch'},'🔍 Sélectionner un élève'),
+          ce('div',{className:'ch'},'Sélectionner un élève'),
           ce('select',{className:'inp sel',defaultValue:t4el,onChange:ev=>st4el(ev.target.value)},
             ce('option',{value:''},'— Choisir un élève —'),
             ...eleves.map(el2=>ce('option',{key:el2.id,value:el2.id},el2.nom))
           ),
           el&&profileTags(el),
-          el&&(el.notes)&&ce('div',{className:'infob infob-b mt8 xt'},el.notes)
+          el&&el.notes&&ce('div',{className:'infob infob-b mt8 xt'},el.notes)
         ),
         !el&&ce('div',{className:'empty'},ce('div',{className:'ei'},'📊'),ce('p',null,'Sélectionnez un élève pour voir ses statistiques')),
         el&&stats&&ce('div',null,
           ce('div',{className:'card'},
-            ce('div',{className:'ch'},el.nom+' — Récapitulatif global',ce('span',{className:'sub'}),stats.count+' dictée(s) analysée(s)'),
-            ce('div',{className:'sg',style:{gridTemplateColumns:'repeat(6,1fr)'}},
+            ce('div',{className:'ch'},el.nom+' — Récapitulatif',ce('span',{className:'sub'},stats.count+' dictée(s)')),
+            ce('div',{className:'sg'},
               ...CK.map(k=>ce('div',{key:k,className:'sb2',style:{background:CC[k].b}},
                 ce('div',{className:'sbv',style:{color:CC[k].c}},stats.totals[k]),
                 ce('div',{className:'sbl',style:{color:CC[k].c}},CC[k].l)
-              )),
-              ce('div',{className:'sb2',style:{background:'var(--bl)'}},
-                ce('div',{className:'sbv',style:{color:'var(--blue)'}},tot(stats.totals)),
-                ce('div',{className:'sbl',style:{color:'var(--blue)'}},'TOTAL')
-              )
+              ))
             ),
             ce('div',{className:'row mt12',style:{gap:16,flexWrap:'wrap',alignItems:'flex-start'}},
               ce(DonutChart,{data:CK.map(k=>({v:stats.totals[k],c:CC[k].c})),sz:120}),
@@ -771,11 +1095,11 @@ function App() {
             )
           ),
           evo&&evo.length>0&&ce('div',{className:'chart-box'},
-            ce('div',{className:'chart-title'},'📈 Évolution de '+el.nom+' — total erreurs par dictée'),
+            ce('div',{className:'chart-title'},'Evolution '+el.nom+' — total erreurs'),
             ce(LineChart,{series:[{name:el.nom,vals:evo.map(e=>e.total),color:'var(--blue)'}],labels:evo.map(e=>e.label)})
           ),
           evo&&evo.length>=2&&ce('div',{className:'chart-box'},
-            ce('div',{className:'chart-title'},'📊 '+el.nom+' — détail par type d\'erreur sur l\'année'),
+            ce('div',{className:'chart-title'},el.nom+' — par type sur l\'année'),
             ce(LineChart,{series:CK.map(k=>({name:CC[k].l,vals:evo.map(e=>e[k]),color:CC[k].c})),labels:evo.map(e=>e.label),h:180}),
             ce('div',{className:'lgd mt8'},
               ...CK.map(k=>ce('div',{key:k,className:'lgdi',style:{color:CC[k].c,border:'1.5px solid '+CC[k].c,background:CC[k].b}},
@@ -784,21 +1108,19 @@ function App() {
             )
           ),
           classEvo.length>0&&evo&&evo.length>0&&ce('div',{className:'chart-box'},
-            ce('div',{className:'chart-title'},'📊 '+el.nom+' vs Moyenne classe (total erreurs)'),
+            ce('div',{className:'chart-title'},el.nom+' vs Moyenne classe'),
             ce(LineChart,{series:[
               {name:el.nom,vals:evo.map(e=>e.total),color:'var(--blue)'},
               {name:'Classe moy.',vals:classEvo.map(c=>c.total),color:'#9CA3AF'}
             ],labels:classEvo.map(c=>c.label)})
           ),
           ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
-            ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Rapport élève PDF')
-          )
+            ce('button',{className:'btn bo',onClick:()=>window.print()},'Rapport PDF'))
         ),
-        el&&!stats&&ce('div',{className:'infob infob-y'},'Aucune analyse pour cet élève. Rendez-vous dans l\'onglet ③ Analyser.')
+        el&&!stats&&ce('div',{className:'infob infob-y'},'Aucune analyse pour cet élève.')
       );
     }
 
-    /* ── Sous-onglet 1 : Par élève ── */
     function S1() {
       const sorted=sortedEleves();
       const th=(label,col)=>ce('th',{className:'sortable',onClick:()=>st4sort(prev=>prev.col===col?{col,dir:-prev.dir}:{col,dir:-1})},
@@ -809,7 +1131,7 @@ function App() {
           ce('table',{className:'rt'},
             ce('thead',null,ce('tr',null,
               th('Élève','nom'),th('S','S'),th('L','L'),th('A','A'),th('H','H'),th('P','P'),th('Total','tot'),
-              ce('th',null,'Dicts'),ce('th',null,'Profil')
+              ce('th',null,'Dict.'),ce('th',null,'Profil')
             )),
             ce('tbody',null,
               sorted.map(el=>{
@@ -820,22 +1142,20 @@ function App() {
                 const c2=stats?clr(stats.avg,'P3','Moyen'):null;
                 const rows=[
                   ce('tr',{key:el.id,onClick:()=>st4xp(exp?null:el.id)},
-                    ce('td',null,ce('div',{className:'row',style:{gap:6}},
-                      c2&&ce('span',{className:'dot',style:{background:clrC(c2)}}),el.nom
-                    )),
+                    ce('td',null,ce('div',{className:'row',style:{gap:6}},c2&&ce('span',{className:'dot',style:{background:clrC(c2)}}),el.nom)),
                     ...CK.map(k=>ce('td',{key:k,style:{color:CC[k].c,fontFamily:'JetBrains Mono',fontWeight:600}},stats?stats.totals[k]:'-')),
                     ce('td',{style:{fontFamily:'JetBrains Mono',fontWeight:700}},totV),
                     ce('td',null,stats?stats.count:0),
-                    ce('td',null,(el.profiles||[]).slice(0,2).map(k=>ce('span',{key:k,className:'ptag',style:{fontSize:'.62rem'}},pLabel(k).slice(0,5))).concat((el.profiles||[]).length>2?[ce('span',{key:'m',className:'ptag'},'…')]:[] ))
+                    ce('td',null,(el.profiles||[]).slice(0,2).map(k=>ce('span',{key:k,className:'ptag',style:{fontSize:'.62rem'}},pLabel(k).slice(0,6))))
                   )
                 ];
                 if (exp&&evo) rows.push(
                   ce('tr',{key:el.id+'-x'},
                     ce('td',{colSpan:9,style:{padding:'10px 16px',background:'var(--bl)'}},
-                      ce('div',{className:'chart-title'},el.nom+' — évolution par type d\'erreur'),
+                      ce('div',{className:'chart-title'},el.nom+' — evolution'),
                       evo.length>=2
                         ?ce(LineChart,{series:CK.map(k=>({name:k,vals:evo.map(e=>e[k]),color:CC[k].c})),labels:evo.map(e=>e.label),h:130})
-                        :ce('p',{className:'xt gt',style:{padding:8}},'2 dictées minimum pour le graphique')
+                        :ce('p',{className:'xt gt',style:{padding:8}},'2 dictées minimum')
                     )
                   )
                 );
@@ -843,7 +1163,7 @@ function App() {
               }).flat()
             ),
             ce('tfoot',null,ce('tr',null,
-              ce('td',null,'CLASSE TOTAUX'),
+              ce('td',null,'TOTAUX'),
               ...CK.map(k=>{ const v=eleves.reduce((s,el)=>{ const st=getElStats(el.id); return s+(st?st.totals[k]:0); },0); return ce('td',{key:k,style:{color:CC[k].c,fontFamily:'JetBrains Mono'}},v); }),
               ce('td',{style:{fontFamily:'JetBrains Mono'}},eleves.reduce((s,el)=>{ const st=getElStats(el.id); return s+(st?tot(st.totals):0); },0)),
               ce('td',null,analyses.length),ce('td',null)
@@ -851,12 +1171,10 @@ function App() {
           )
         ),
         ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
-          ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Exporter PDF')
-        )
+          ce('button',{className:'btn bo',onClick:()=>window.print()},'Exporter PDF'))
       );
     }
 
-    /* ── Sous-onglet 2 : Classe ── */
     function S2() {
       const classEvo=getClassEvo();
       const totByType=CK.reduce((acc,k)=>{ acc[k]=eleves.reduce((s,el)=>{ const st=getElStats(el.id); return s+(st?st.totals[k]:0); },0); return acc; },{});
@@ -864,7 +1182,7 @@ function App() {
       if (!analyses.length) return ce('div',{className:'empty'},ce('div',{className:'ei'},'📊'),ce('p',null,'Aucune analyse disponible'));
       return ce('div',null,
         ce('div',{className:'card'},
-          ce('div',{className:'ch'},'🏫 Répartition des erreurs — Classe entière',ce('span',{className:'sub'},analyses.length+' analyses · '+dictees.length+' dictées')),
+          ce('div',{className:'ch'},'Répartition — Classe entière',ce('span',{className:'sub'},analyses.length+' analyses')),
           ce('div',{className:'sg'},
             ...CK.map(k=>ce('div',{key:k,className:'sb2',style:{background:CC[k].b}},
               ce('div',{className:'sbv',style:{color:CC[k].c}},totByType[k]),
@@ -877,54 +1195,46 @@ function App() {
               HBar(totByType[k],maxType,CC[k].c),
               ce('span',{className:'mn xt',style:{color:CC[k].c,width:32,textAlign:'right',flexShrink:0}},totByType[k])
             ))
-          ),
-          ce(DonutChart,{data:CK.map(k=>({v:totByType[k],c:CC[k].c})),sz:110})
+          )
         ),
         classEvo.length>0&&ce('div',{className:'chart-box'},
-          ce('div',{className:'chart-title'},'📈 Évolution classe — moyenne erreurs par dictée'),
+          ce('div',{className:'chart-title'},'Evolution classe — moyenne erreurs par dictée'),
           ce(BarChart,{data:classEvo})
         ),
         ce('div',{className:'card'},
-          ce('div',{className:'ch'},'🚨 Top 3 élèves avec le plus d\'erreurs par type'),
+          ce('div',{className:'ch'},'Top 3 par type d\'erreur'),
           ...CK.map(k=>{
             const ranked=[...eleves].map(el=>{ const st=getElStats(el.id); return {el,v:st?st.totals[k]:0}; }).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,3);
             if (!ranked.length) return null;
             return ce('div',{key:k,className:'mb10'},
-              ce('div',{className:'row mb4',style:{gap:6}},ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c}},CC[k].l+' ('+k+')')),
+              ce('div',{className:'row mb4'},ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c}},CC[k].l+' ('+k+')')),
               ...ranked.map((r,i)=>ce('div',{key:r.el.id,className:'row',style:{gap:8,marginBottom:4}},
                 ce('span',{className:'mn xt',style:{width:16,color:CC[k].c,fontWeight:700}},(i+1)+'.'),
                 ce('span',{style:{flex:1,fontSize:'.82rem',fontWeight:600}},r.el.nom),
                 HBar(r.v,ranked[0].v,CC[k].c),
-                ce('span',{className:'mn xt',style:{color:CC[k].c,width:24,textAlign:'right',flexShrink:0}},r.v)
+                ce('span',{className:'mn xt',style:{color:CC[k].c,width:24,textAlign:'right'}},r.v)
               ))
             );
           }).filter(Boolean)
         ),
         ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
-          ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Exporter PDF')
-        )
+          ce('button',{className:'btn bo',onClick:()=>window.print()},'Exporter PDF'))
       );
     }
 
-    /* ── Sous-onglet 3 : Évolution ── */
     function S3() {
       const isClass=t4evo==='';
       const el=!isClass?eleves.find(e=>e.id===t4evo):null;
       const evo=isClass?getClassEvo():el?getElEvo(el.id):[];
       const labels=evo.map(e=>e.label);
-      const seriesTotal=[{name:'Total',vals:evo.map(e=>e.total||0),color:'var(--blue)'}];
-      const seriesByType=t4ck.map(k=>({name:CC[k].l,vals:evo.map(e=>e[k]||0),color:CC[k].c}));
       return ce('div',null,
         ce('div',{className:'card'},
-          ce('div',{className:'ch'},'📈 Progression de'),
           ce('select',{className:'inp sel',defaultValue:t4evo,onChange:ev=>st4evo(ev.target.value)},
             ce('option',{value:''},'Classe entière'),
             ...eleves.map(el2=>ce('option',{key:el2.id,value:el2.id},el2.nom))
-          ),
-          el&&profileTags(el)
+          )
         ),
         ce('div',{className:'card'},
-          ce('div',{className:'ch'},'Filtrer les types d\'erreurs'),
           ce('div',{className:'lgd'},
             ...CK.map(k=>ce('div',{key:k,className:'lgdi'+(t4ck.includes(k)?'':' off'),
               style:{background:t4ck.includes(k)?CC[k].b:'white',color:CC[k].c,border:'1.5px solid '+(t4ck.includes(k)?CC[k].c:'var(--bdr)')},
@@ -935,56 +1245,179 @@ function App() {
         ),
         evo.length>0&&ce('div',null,
           ce('div',{className:'chart-box'},
-            ce('div',{className:'chart-title'},'Total erreurs — '+(isClass?'Classe entière':el&&el.nom)),
-            ce(LineChart,{series:seriesTotal,labels})
+            ce('div',{className:'chart-title'},'Total erreurs'),
+            ce(LineChart,{series:[{name:'Total',vals:evo.map(e=>e.total||0),color:'var(--blue)'}],labels})
           ),
           t4ck.length>0&&ce('div',{className:'chart-box'},
-            ce('div',{className:'chart-title'},'Évolution par type — '+(isClass?'Classe entière':el&&el.nom)),
-            ce(LineChart,{series:seriesByType,labels,h:190}),
+            ce('div',{className:'chart-title'},'Par type d\'erreur'),
+            ce(LineChart,{series:t4ck.map(k=>({name:CC[k].l,vals:evo.map(e=>e[k]||0),color:CC[k].c})),labels,h:190}),
             ce('div',{className:'lgd mt8'},
-              ...seriesByType.map(s=>ce('div',{key:s.name,className:'lgdi',style:{color:s.color,border:'1.5px solid '+s.color,background:'white'}},
-                ce('div',{className:'lgdd',style:{background:s.color}}),s.name
+              ...t4ck.map(k=>ce('div',{key:k,className:'lgdi',style:{color:CC[k].c,border:'1.5px solid '+CC[k].c}},
+                ce('div',{className:'lgdd',style:{background:CC[k].c}}),CC[k].l
               ))
             )
           )
         ),
-        evo.length===0&&ce('div',{className:'empty'},ce('div',{className:'ei'},'📈'),ce('p',null,'Pas encore de données sur cette sélection')),
+        evo.length===0&&ce('div',{className:'empty'},ce('div',{className:'ei'},'📈'),ce('p',null,'Pas de données')),
         ce('div',{className:'row mt12 no-print',style:{justifyContent:'flex-end'}},
-          ce('button',{className:'btn bo',onClick:()=>window.print()},'🖨️ Exporter PDF')
+          ce('button',{className:'btn bo',onClick:()=>window.print()},'Exporter PDF'))
+      );
+    }
+
+    /* ── S4 : Groupes pour exercices ── */
+    function S4() {
+      const allPossibleGroups = CK.flatMap((k1,i)=>CK.slice(i+1).map(k2=>k1+'+'+k2));
+
+      const ElCard = ({e, groupKey, col}) => {
+        const isMenuOpen = moveMenu&&moveMenu.eleveId===e.eleveId&&moveMenu.groupKey===groupKey&&moveMenu.col===col;
+        return ce('div',{key:e.eleveId,style:{display:'flex',alignItems:'center',gap:6,padding:'5px 8px',background:'white',borderRadius:8,border:'1px solid var(--bdr)',marginBottom:4}},
+          ce('span',{style:{flex:1,fontSize:'.81rem',fontWeight:600}},e.nom),
+          (e.profiles||[]).length>0&&ce('span',{className:'ptag',style:{fontSize:'.62rem'}},pLabel((e.profiles||[])[0]).slice(0,4)),
+          ce('div',{style:{display:'flex',gap:3,flexShrink:0,position:'relative'}},
+            col==='remed'
+              ?ce('button',{className:'btn bp bxs',title:'Passer en approfondissement',onClick:()=>moveEleve(e.eleveId,groupKey,'remed',groupKey,'appro')},'→')
+              :ce('button',{className:'btn bg bxs',title:'Passer en remédiation',onClick:()=>moveEleve(e.eleveId,groupKey,'appro',groupKey,'remed')},'←'),
+            ce('button',{className:'btn bg bxs',title:'Changer de groupe',
+              onClick:()=>setMoveMenu(isMenuOpen?null:{eleveId:e.eleveId,groupKey,col})},'↕'),
+            isMenuOpen&&ce('div',{style:{position:'absolute',top:34,right:0,background:'white',border:'1.5px solid var(--bdr)',borderRadius:9,padding:6,zIndex:100,minWidth:200,boxShadow:'0 4px 16px rgba(0,0,0,.12)'}},
+              ce('div',{className:'xt gt mb4',style:{fontWeight:700,padding:'2px 6px'}},'Déplacer vers :'),
+              ...allPossibleGroups.flatMap(gk=>[
+                ce('button',{key:gk+'-r',style:{display:'block',width:'100%',textAlign:'left',padding:'5px 8px',border:'none',background:'none',cursor:'pointer',fontSize:'.77rem',borderRadius:6},
+                  onClick:()=>moveEleve(e.eleveId,groupKey,col,gk,'remed'),
+                  onMouseEnter:ev=>ev.target.style.background='var(--bl)',
+                  onMouseLeave:ev=>ev.target.style.background='none'},
+                  'Groupe '+gk+' — Remédiation'),
+                ce('button',{key:gk+'-a',style:{display:'block',width:'100%',textAlign:'left',padding:'5px 8px',border:'none',background:'none',cursor:'pointer',fontSize:'.77rem',borderRadius:6},
+                  onClick:()=>moveEleve(e.eleveId,groupKey,col,gk,'appro'),
+                  onMouseEnter:ev=>ev.target.style.background='var(--bl)',
+                  onMouseLeave:ev=>ev.target.style.background='none'},
+                  'Groupe '+gk+' — Approfondissement')
+              ])
+            )
+          )
+        );
+      };
+
+      return ce('div',null,
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},'🎯 Groupes pour exercices'),
+          ce('div',{className:'infob infob-b mb10'},'Sélectionnez une dictée. Le compilateur classe automatiquement les élèves selon leurs 2 types d\'erreurs dominants. Ajustez les groupes puis exportez vers votre agent IA.'),
+          ce('div',{className:'row',style:{flexWrap:'wrap',gap:8}},
+            ce('select',{className:'inp sel f1',defaultValue:selDict4,
+              onChange:ev=>setSelDict4(ev.target.value)},
+              ce('option',{value:''},'— Choisir une dictée —'),
+              ...dictees.map(d=>ce('option',{key:d.id,value:d.id},d.titre+' · '+d.date))
+            ),
+            selDict4&&Object.keys(groups).length>0&&ce('button',{className:'btn bp',onClick:exportBloc},'📋 Copier pour l\'agent IA')
+          )
+        ),
+        selDict4&&Object.keys(groups).length===0&&ce('div',{className:'infob infob-y'},'Aucune analyse pour cette dictée. Analysez d\'abord les copies dans l\'onglet ③.'),
+        selDict4&&Object.keys(groups).length>0&&ce('div',null,
+          ...Object.entries(groups).map(([key,g])=>ce('div',{key:key,className:'card'},
+            ce('div',{className:'ch'},
+              ce('div',{className:'row',style:{gap:6}},
+                ...key.split('+').map(k=>ce('span',{key:k,className:'chip',style:{background:CC[k].b,color:CC[k].c}},CC[k].l+' ('+k+')'))
+              )
+            ),
+            ce('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}},
+              /* Remédiation */
+              ce('div',null,
+                ce('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:8}},
+                  ce('div',{style:{width:10,height:10,borderRadius:3,background:'#F59E0B',flexShrink:0}}),
+                  ce('span',{style:{fontSize:'.75rem',fontWeight:700,color:'#92400E'}},'REMÉDIATION'),
+                  ce('span',{className:'xt gt',style:{marginLeft:4}},'('+g.remed.length+')')
+                ),
+                ...g.remed.map(e=>ce(ElCard,{key:e.eleveId,e,groupKey:key,col:'remed'})),
+                ce('select',{className:'inp sel',style:{fontSize:'.73rem',minHeight:34,padding:'4px 8px',marginTop:4},
+                  defaultValue:'',
+                  onChange:ev=>{ if(ev.target.value){addToGroup(ev.target.value,key,'remed');ev.target.value='';} }},
+                  ce('option',{value:''},'+ Ajouter un élève'),
+                  ...eleves.filter(el=>!g.remed.some(e=>e.eleveId===el.id)&&!g.appro.some(e=>e.eleveId===el.id))
+                    .map(el=>ce('option',{key:el.id,value:el.id},el.nom))
+                )
+              ),
+              /* Approfondissement */
+              ce('div',null,
+                ce('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:8}},
+                  ce('div',{style:{width:10,height:10,borderRadius:3,background:'#10B981',flexShrink:0}}),
+                  ce('span',{style:{fontSize:'.75rem',fontWeight:700,color:'#065F46'}},'APPROFONDISSEMENT'),
+                  ce('span',{className:'xt gt',style:{marginLeft:4}},'('+g.appro.length+')')
+                ),
+                ...g.appro.map(e=>ce(ElCard,{key:e.eleveId,e,groupKey:key,col:'appro'})),
+                ce('select',{className:'inp sel',style:{fontSize:'.73rem',minHeight:34,padding:'4px 8px',marginTop:4},
+                  defaultValue:'',
+                  onChange:ev=>{ if(ev.target.value){addToGroup(ev.target.value,key,'appro');ev.target.value='';} }},
+                  ce('option',{value:''},'+ Ajouter un élève'),
+                  ...eleves.filter(el=>!g.remed.some(e=>e.eleveId===el.id)&&!g.appro.some(e=>e.eleveId===el.id))
+                    .map(el=>ce('option',{key:el.id,value:el.id},el.nom))
+                )
+              )
+            )
+          ))
         )
       );
     }
 
     return ce('div',null,
       ce('div',{className:'stnav no-print'},
-        ...["Vue d'ensemble","Par élève","Classe","Évolution"].map((n,i)=>ce('button',{key:i,className:'stbtn'+(t4sub===i?' on':''),onClick:()=>st4sub(i)},n))
+        ...["Vue d'ensemble","Par élève","Classe","Évolution","Groupes exercices"].map((n,i)=>ce('button',{key:i,className:'stbtn'+(t4sub===i?' on':''),onClick:()=>st4sub(i)},n))
       ),
       t4sub===0&&S0(),
       t4sub===1&&S1(),
       t4sub===2&&S2(),
-      t4sub===3&&S3()
+      t4sub===3&&S3(),
+      t4sub===4&&S4()
     );
   }
 
-  /* ══════════════════════════════════════════════════════
-     T5 — OUTILS
-  ══════════════════════════════════════════════════════ */
   function T5() {
+    const agentExUrl = cfg.agentExUrl||'';
+    const agentDiUrl = cfg.agentDiUrl||'';
+
+    const copyPrompt = (txt) => {
+      try { navigator.clipboard.writeText(txt); msg('Prompt copié !'); }
+      catch(e) { msg('Sélectionnez et copiez manuellement','inf'); }
+    };
+
     return ce('div',null,
       ce('div',{className:'card'},
-        ce('div',{className:'ch'},'🔗 Outils connectés'),
-        ce('div',{className:'infob infob-b mb10'},'Ces outils partagent les mêmes données élèves/dictées via localStorage. Ouvrez-les depuis le même navigateur.'),
+        ce('div',{className:'ch'},'🔗 Mes agents IA personnalisés'),
+        ce('div',{className:'infob infob-b mb12'},'Collez ci-dessous l\'URL de vos agents IA personnels après y avoir intégré les prompts. Les boutons s\'ouvriront directement sur votre agent.'),
+        ce('div',{className:'col',style:{gap:12}},
+          ce('div',{className:'col',style:{gap:4}},
+            ce('label',{className:'xt gt',style:{fontWeight:700}},'URL Agent Exercices'),
+            ce('div',{className:'row'},
+              ce('input',{className:'inp f1',placeholder:'https://chat.mistral.ai/... ou autre URL agent',defaultValue:agentExUrl,
+                onBlur:ev=>sc(p=>Object.assign({},p,{agentExUrl:ev.target.value}))}),
+              ce('a',{href:agentExUrl||'#',target:'_blank',className:'btn bp bsm',
+                style:{opacity:agentExUrl?1:0.4,pointerEvents:agentExUrl?'auto':'none'}},'Ouvrir →')
+            )
+          ),
+          ce('div',{className:'col',style:{gap:4}},
+            ce('label',{className:'xt gt',style:{fontWeight:700}},'URL Agent Dictées'),
+            ce('div',{className:'row'},
+              ce('input',{className:'inp f1',placeholder:'https://chat.mistral.ai/... ou autre URL agent',defaultValue:agentDiUrl,
+                onBlur:ev=>sc(p=>Object.assign({},p,{agentDiUrl:ev.target.value}))}),
+              ce('a',{href:agentDiUrl||'#',target:'_blank',className:'btn bp bsm',
+                style:{opacity:agentDiUrl?1:0.4,pointerEvents:agentDiUrl?'auto':'none'}},'Ouvrir →')
+            )
+          )
+        )
+      ),
+      ce('div',{className:'card'},
+        ce('div',{className:'ch'},'📋 Outils connectés'),
+        ce('div',{className:'infob infob-b mb10'},'Ces outils partagent les mêmes données élèves/dictées. Ouvrez-les depuis le même navigateur.'),
         ce('div',{className:'col',style:{gap:10}},
           ce('div',{className:'li'},
             ce('div',{className:'col f1',style:{gap:2}},
-              ce('span',{style:{fontWeight:700,fontSize:'.87rem'}},'✏️ Créateur d\'exercices CM1/CM2'),
-              ce('span',{className:'xt gt'},'Génère des exercices personnalisés par type d\'erreur et profil élève, avec export PDF')
+              ce('span',{style:{fontWeight:700,fontSize:'.87rem'}},'✏️ Créateur d\'exercices'),
+              ce('span',{className:'xt gt'},'Génère des exercices différenciés par groupe, type d\'erreur et profil élève')
             ),
             ce('a',{href:'createur-exercices-cm1.html',target:'_blank',className:'btn bp bsm'},'Ouvrir →')
           ),
           ce('div',{className:'li'},
             ce('div',{className:'col f1',style:{gap:2}},
-              ce('span',{style:{fontWeight:700,fontSize:'.87rem'}},'📖 Créateur de dictées CM1/CM2'),
+              ce('span',{style:{fontWeight:700,fontSize:'.87rem'}},'📖 Créateur de dictées'),
               ce('span',{className:'xt gt'},'Crée des dictées progressives ciblant les erreurs récurrentes de la classe')
             ),
             ce('a',{href:'createur-dictees-cm1.html',target:'_blank',className:'btn bp bsm'},'Ouvrir →')
@@ -992,33 +1425,27 @@ function App() {
         )
       ),
       ce('div',{className:'card'},
-        ce('div',{className:'ch'},'🤖 Le Chat Mistral — Agent spécialisé'),
-        ce('div',{className:'infob infob-b mb12'},'Copiez un prompt ci-dessous, ouvrez Le Chat Mistral, collez-le en instruction système pour créer votre agent pédagogique personnel.'),
+        ce('div',{className:'ch'},'🤖 Prompts — Agents IA'),
+        ce('div',{className:'infob infob-b mb12'},'Copiez ces prompts et collez-les en instruction système de votre agent IA préféré (Mistral AI Studio, ChatGPT, Claude, Gemini...). Compatible avec toutes les IA.'),
         ce('div',{className:'col',style:{gap:12}},
-          ce('div',{className:'card',style:{background:'var(--cream)',padding:'12px'}},
-            ce('div',{className:'ch',style:{marginBottom:8}},'Prompt — Créateur d\'exercices'),
-            ce('pre',{className:'prompt'},PROMPT_EXOS),
-            ce('div',{className:'row mt8'},
-              ce('button',{className:'btn bg bsm',onClick:()=>{ try{navigator.clipboard.writeText(PROMPT_EXOS);msg('Prompt copié !');}catch(e){msg('Copie manuelle requis','inf');} }},'📋 Copier'),
-              ce('a',{href:'https://chat.mistral.ai',target:'_blank',className:'btn bo bsm'},'Ouvrir Le Chat →')
+          ce('div',{className:'card',style:{background:'var(--cream)',padding:12}},
+            ce('div',{className:'ch',style:{marginBottom:8}},'Agent Exercices — La Plume Rouge'),
+            ce('div',{className:'infob infob-g mb8'},'Ce prompt contient toutes les instructions pour créer des exercices différenciés à partir des données exportées depuis La Plume Rouge.'),
+            ce('div',{className:'row',style:{gap:8}},
+              ce('button',{className:'btn bp',onClick:()=>copyPrompt(PROMPT_EXERCICES)},'📋 Copier le prompt'),
+              agentExUrl&&ce('a',{href:agentExUrl,target:'_blank',className:'btn bo'},'Ouvrir mon agent →')
             )
           ),
-          ce('div',{className:'card',style:{background:'var(--cream)',padding:'12px'}},
-            ce('div',{className:'ch',style:{marginBottom:8}},'Prompt — Créateur de dictées'),
-            ce('pre',{className:'prompt'},PROMPT_DICT),
-            ce('div',{className:'row mt8'},
-              ce('button',{className:'btn bg bsm',onClick:()=>{ try{navigator.clipboard.writeText(PROMPT_DICT);msg('Prompt copié !');}catch(e){msg('Copie manuelle requis','inf');} }},'📋 Copier'),
-              ce('a',{href:'https://chat.mistral.ai',target:'_blank',className:'btn bo bsm'},'Ouvrir Le Chat →')
-            )
+          ce('div',{className:'card',style:{background:'var(--cream)',padding:12}},
+            ce('div',{className:'ch',style:{marginBottom:8}},'Agent Dictées — La Plume Rouge'),
+            ce('div',{className:'infob infob-y mb8'},'Prompt en cours de finalisation — disponible prochainement.'),
+            ce('button',{className:'btn bg',disabled:true},'Bientôt disponible')
           )
         )
       )
     );
   }
 
-  /* ══════════════════════════════════════════════════════
-     T6 — CONFIG
-  ══════════════════════════════════════════════════════ */
   function T6() {
     const p=cfg.provider||'mistral';
     return ce('div',null,
