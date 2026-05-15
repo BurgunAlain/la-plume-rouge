@@ -475,6 +475,9 @@ function App() {
   const [t4ck,   st4ck]  =useState(CK.slice());
   const [t4xp,   st4xp]  =useState(null);
   const [t4sort, st4sort]=useState({col:'nom',dir:1});
+  const [selDict4, setSelDict4]=useState('');
+  const [groups,   setGroups]  =useState({});
+  const [moveMenu, setMoveMenu]=useState(null);
 
   useEffect(()=>{lset(LSK.e,eleves);},[eleves]);
   useEffect(()=>{lset(LSK.d,dictees);},[dictees]);
@@ -980,11 +983,7 @@ function App() {
       return groups;
     };
 
-    const [selDict4, setSelDict4] = React.useState('');
-    const [groups, setGroups] = React.useState({});
-    const [moveMenu, setMoveMenu] = React.useState(null);
-
-    React.useEffect(()=>{
+    useEffect(()=>{
       if (selDict4) setGroups(buildGroups(selDict4));
       else setGroups({});
     },[selDict4,analyses,eleves]);
