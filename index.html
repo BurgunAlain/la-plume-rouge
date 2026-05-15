@@ -484,6 +484,7 @@ function App() {
   const [exCorrec,  setExCorrec]  =useState('separee');
   const [exResult,  setExResult]  =useState('');
   const [exLoading, setExLoading] =useState(false);
+  const [exFormat,  setExFormat]  =useState('');
   const [groups,   setGroups]  =useState({});
   const [moveMenu, setMoveMenu]=useState(null);
 
@@ -1347,7 +1348,6 @@ function App() {
     const exDictee   = selDict4;
     const exGroups   = groups;
 
-    const [exFormat,  setExFormat]  = React.useState('');
 
     const FORMES = [
       {k:'completer',  l:'Compléter les blancs'},
