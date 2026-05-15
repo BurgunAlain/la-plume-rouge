@@ -440,6 +440,31 @@ function DonutChart(props) {
 /* ══════════════════════════════════════════════════════════════
    APP
 ══════════════════════════════════════════════════════════════ */
+function computeGroups(dicteeId, elevesArr, analysesArr) {
+    if (!dicteeId) return {};
+    const anals=analysesArr.filter(a=>a.dicteeId===dicteeId);
+    if (!anals.length) return {};
+    const grps={};
+    elevesArr.forEach(el=>{
+      const anal=anals.find(a=>a.eleveId===el.id);
+      let top2;
+      if (!anal||!(anal.erreurs||[]).length){
+        top2=['S','A'];
+      } else {
+        const c=cnt(anal.erreurs||[]);
+        const sorted=CK.slice().sort((a,b)=>c[b]-c[a]);
+        top2=sorted.slice(0,2).filter(k=>c[k]>0);
+        if (top2.length<2) top2=[top2[0]||'S',sorted[2]||'A'];
+      }
+      const key=top2.sort().join('+');
+      const isZero=!anal||!(anal.erreurs||[]).length;
+      if (!grps[key]) grps[key]={types:top2.sort(),remed:[],appro:[]};
+      if (isZero) grps[key].appro.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
+      else grps[key].remed.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
+    });
+    return grps;
+  }
+
 function App() {
   const [eleves,  se] = useState(()=>lget(LSK.e,[]));
   const [dictees, sd] = useState(()=>lget(LSK.d,[]));
