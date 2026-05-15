@@ -1284,7 +1284,10 @@ function App() {
             selDict4&&Object.keys(groups).length>0&&ce('button',{className:'btn bp',onClick:exportBloc},'📋 Copier pour l\'agent IA')
           )
         ),
-        selDict4&&Object.keys(groups).length===0&&ce('div',{className:'infob infob-y'},'Aucune analyse pour cette dictée. Analysez d\'abord les copies dans l\'onglet ③.'),
+        selDict4&&Object.keys(groups).length===0&&ce('div',{className:'col',style:{gap:8}},
+          ce('div',{className:'infob infob-y'},'Aucune analyse trouvée pour cette dictée.'),
+          ce('button',{className:'btn bg bsm',onClick:()=>setGroups(computeGroups(selDict4,eleves,analyses))},'🔄 Recalculer les groupes')
+        ),
         selDict4&&Object.keys(groups).length>0&&ce('div',null,
           ...Object.entries(groups).map(([key,g])=>ce('div',{key:key,className:'card'},
             ce('div',{className:'ch'},
