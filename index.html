@@ -352,6 +352,11 @@ Page HTML autonome optimisée pour iPad et tablettes. Inclut :
 
 ## RÈGLES GÉNÉRALES
 
+- **INTERDIRE LES DOUBLONS** : dans un exercice de choix, les deux options doivent toujours être DIFFÉRENTES — exemple INTERDIT : (jonchaient / jonchaient), exemple CORRECT : (jonchaient / jonchait)
+- **COHÉRENCE TYPE/EXERCICE** : un exercice annoncé Son ne doit contenir que des erreurs phonétiques, pas d'homophones ni d'accords
+- **UTILISER LE TEXTE DE LA DICTÉE** : si un texte est fourni dans les données, les exercices s'appuient sur ses mots et phrases — ne pas inventer hors contexte
+- **ITEMS PERTINENTS** : chaque item doit nécessiter une vraie réflexion — éviter les réponses évidentes sans connaître la règle
+- **VARIÉTÉ** : dans un même exercice, ne pas répéter le même mot ou structure plus de 2 fois
 - Tu réponds toujours en **français**
 - Tu ne génères jamais d'exercice sans avoir reçu le bloc de données complet
 - Tu n'inventes pas de noms d'élèves — tu utilises uniquement ceux fournis dans le bloc
@@ -499,6 +504,7 @@ function App() {
   const [t2dat, st2dat]=useState('');
   const [t2per, st2per]=useState('P1');
   const [t2dif, st2dif]=useState('Moyen');
+  const [t2txt, st2txt]=useState('');
   const [t2exp, st2exp]=useState(null);
   /* T3 */
   const [t3el,   st3el]  =useState('');
@@ -830,8 +836,8 @@ function App() {
   function T2() {
     const add = () => {
       if (!t2tit.trim()){ msg('Titre requis','err'); return; }
-      sd(p=>[...p,{id:uid(),titre:t2tit.trim(),date:t2dat||new Date().toISOString().slice(0,10),periode:t2per,difficulte:t2dif}]);
-      st2tit(''); st2dat(''); st2key(k=>k+1); msg('Dictée ajoutée');
+      sd(p=>[...p,{id:uid(),titre:t2tit.trim(),date:t2dat||new Date().toISOString().slice(0,10),periode:t2per,difficulte:t2dif,texte:t2txt.trim()}]);
+      st2tit(''); st2dat(''); st2txt(''); st2key(k=>k+1); msg('Dictée ajoutée');
     };
     return ce('div',null,
       ce('div',{className:'card'},
@@ -860,7 +866,8 @@ function App() {
                 ce('div',{className:'row'},
                   ce('div',{className:'col f1',style:{gap:2}},
                     ce('span',{style:{fontWeight:700,fontSize:'.85rem'}},d.titre),
-                    ce('span',{className:'xt gt'},d.date+' · '+d.periode+' · '+d.difficulte+' · '+nb+'/'+eleves.length+' corr.')
+                    ce('span',{className:'xt gt'},d.date+' · '+d.periode+' · '+d.difficulte+' · '+nb+'/'+eleves.length+' corr.'),
+              d.texte&&ce('span',{className:'xt gt',style:{fontStyle:'italic',marginTop:2}},d.texte.length>60?d.texte.slice(0,60)+'…':d.texte)
                   ),
                   ce('div',{className:'row'},
                     rec.length>0&&ce('button',{className:'btn bg bsm',onClick:()=>st2exp(open?null:d.id)},open?'▲':'🔥 '+rec.length),
@@ -1037,6 +1044,7 @@ function App() {
       if (!d||!Object.keys(groups).length){ msg('Sélectionnez une dictée avec des analyses','err'); return; }
       const rec = getRecurring(selDict4);
       let bloc = 'DICTÉE : '+d.titre+' — '+d.periode+' — '+d.difficulte+'\n';
+      if (d.texte) bloc += 'TEXTE DE LA DICTÉE :\n'+d.texte+'\n\n';
       bloc += 'CLASSE : '+eleves.length+' élèves — '+analyses.filter(a=>a.dicteeId===selDict4).length+' analyses\n';
       if (rec.length>0){
         bloc += 'MOTS FAUTIFS FRÉQUENTS : '+rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')+'\n';
@@ -1470,6 +1478,7 @@ function App() {
       if (!d) return '';
       const rec=getRecurring(exDictee);
       let bloc='DICTÉE : '+d.titre+' — '+d.periode+' — '+d.difficulte+'\n';
+      if (d.texte) bloc+='TEXTE DE LA DICTÉE :\n'+d.texte+'\n\n';
       bloc+='CLASSE : '+eleves.length+' élèves — '+analyses.filter(a=>a.dicteeId===exDictee).length+' analyses\n';
       if (rec.length>0) bloc+='MOTS FAUTIFS FRÉQUENTS : '+rec.map(r=>r.mot+'('+r.code+') x'+r.count).join(', ')+'\n';
       bloc+='MOTS FAUTIFS À RETRAVAILLER : '+(exMotsFaut?'oui':'non')+'\n\n';
