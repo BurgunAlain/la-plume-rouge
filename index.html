@@ -1379,13 +1379,15 @@ function App() {
                       '('+pLabel((el.profiles||[])[0]).slice(0,3)+')'
                     )
                   ),
-                  ...CK.flatMap(k=>{
-                    const isRem = inCell(el.id,k,'remed');
-                    const isAppro = inCell(el.id,k,'appro');
-                    const errN = getErrCount(el.id,k);
+                  ...CK.flatMap((k)=>{
+                    const kk=k; /* capture k explicitly */
+                    const isRem = inCell(el.id,kk,'remed');
+                    const isAppro = inCell(el.id,kk,'appro');
+                    const errN = getErrCount(el.id,kk);
+                    const eleveId2=el.id;
                     return [
                       /* Rem cell */
-                      ce('td',{key:k+'r',
+                      ce('td',{key:kk+'r'+el.id,
                         style:{
                           textAlign:'center',
                           background:isRem?'#FEF3C7':errN>0?'#FFFBF0':'white',
@@ -1393,26 +1395,26 @@ function App() {
                           transition:'background .12s',
                           borderLeft:'1px solid var(--bdr)'
                         },
-                        title:isRem?'Cliquer pour retirer du groupe Rem.':'Cliquer pour ajouter en Rem.',
-                        onClick:()=>toggleCell(el.id,k,'remed')
+                        title:isRem?'Retirer de Rem. '+CC[kk].l:'Ajouter en Rem. '+CC[kk].l,
+                        onClick:(function(eid,kt){ return function(){ toggleCell(eid,kt,'remed'); }; })(eleveId2,kk)
                       },
                         ce('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',gap:2}},
                           isRem
                             ?ce('span',{style:{color:'#92400E',fontWeight:700,fontSize:'.8rem'}},'✓')
                             :ce('span',{style:{color:'#D1D5DB',fontSize:'.75rem'}},'+'),
-                          errN>0?ErrBadge(el.id,k):null
+                          errN>0?ErrBadge(el.id,kk):null
                         )
                       ),
                       /* Appro cell */
-                      ce('td',{key:k+'a',
+                      ce('td',{key:kk+'a'+el.id,
                         style:{
                           textAlign:'center',
                           background:isAppro?'#D1FAE5':'white',
                           padding:'4px 3px',cursor:'pointer',
                           transition:'background .12s'
                         },
-                        title:isAppro?'Cliquer pour retirer du groupe Appro.':'Cliquer pour ajouter en Appro.',
-                        onClick:()=>toggleCell(el.id,k,'appro')
+                        title:isAppro?'Retirer de Appro. '+CC[kk].l:'Ajouter en Appro. '+CC[kk].l,
+                        onClick:(function(eid,kt){ return function(){ toggleCell(eid,kt,'appro'); }; })(eleveId2,kk)
                       },
                         ce('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',gap:2}},
                           isAppro
