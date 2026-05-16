@@ -504,8 +504,10 @@ function App() {
   const [t2dat, st2dat]=useState('');
   const [t2per, st2per]=useState('P1');
   const [t2dif, st2dif]=useState('Moyen');
-  const [t2txt, st2txt]=useState('');
-  const [t2exp, st2exp]=useState(null);
+  const [t2txt,  st2txt] =useState('');
+  const [t2exp,  st2exp] =useState(null);
+  const [t2edit, st2edit]=useState(null);
+  const [t2ekey, st2ekey]=useState(0);
   /* T3 */
   const [t3el,   st3el]  =useState('');
   const [t3di,   st3di]  =useState('');
@@ -839,6 +841,51 @@ function App() {
       sd(p=>[...p,{id:uid(),titre:t2tit.trim(),date:t2dat||new Date().toISOString().slice(0,10),periode:t2per,difficulte:t2dif,texte:t2txt.trim()}]);
       st2tit(''); st2dat(''); st2txt(''); st2key(k=>k+1); msg('Dictée ajoutée');
     };
+
+    const openEdit = (d) => {
+      st2edit(d.id); st2tit(d.titre); st2dat(d.date); st2per(d.periode); st2dif(d.difficulte); st2txt(d.texte||'');
+      st2ekey(k=>k+1);
+    };
+
+    const saveEdit = () => {
+      if (!t2tit.trim()) return;
+      sd(p=>p.map(d=>d.id===t2edit?Object.assign({},d,{titre:t2tit.trim(),date:t2dat,periode:t2per,difficulte:t2dif,texte:t2txt.trim()}):d));
+      st2edit(null); msg('Dictée mise à jour');
+    };
+
+    /* ── Edit mode ── */
+    if (t2edit) {
+      const d=dictees.find(x=>x.id===t2edit);
+      if (!d){ st2edit(null); return null; }
+      return ce('div',null,
+        ce('div',{className:'card'},
+          ce('div',{className:'ch'},
+            ce('button',{className:'btn bg bsm no-print',onClick:()=>st2edit(null)},'← Retour'),
+            '✏️ Modifier : '+d.titre
+          ),
+          ce('div',{key:t2ekey,className:'col'},
+            ce('input',{className:'inp',defaultValue:t2tit,onChange:ev=>st2tit(ev.target.value),placeholder:'Titre…'}),
+            ce('div',{className:'roww'},
+              ce('input',{type:'date',className:'inp sel f1',style:{minWidth:130},defaultValue:t2dat,onChange:ev=>st2dat(ev.target.value)}),
+              ce('select',{className:'inp sel',style:{flex:1},defaultValue:t2per,onChange:ev=>st2per(ev.target.value)},
+                ['P1','P2','P3','P4','P5'].map(p=>ce('option',{key:p,value:p},p))
+              ),
+              ce('select',{className:'inp sel',style:{flex:1},defaultValue:t2dif,onChange:ev=>st2dif(ev.target.value)},
+                ['Facile','Moyen','Difficile'].map(d2=>ce('option',{key:d2,value:d2},d2))
+              )
+            ),
+            ce('textarea',{className:'inp',style:{minHeight:120},defaultValue:t2txt,
+              onChange:ev=>st2txt(ev.target.value),
+              placeholder:'Texte intégral de la dictée…'}),
+            ce('div',{className:'row'},
+              ce('button',{className:'btn bp',onClick:saveEdit},'💾 Enregistrer'),
+              ce('button',{className:'btn bg',onClick:()=>st2edit(null)},'Annuler')
+            )
+          )
+        )
+      );
+    }
+
     return ce('div',null,
       ce('div',{className:'card'},
         ce('div',{className:'ch'},'📝 Nouvelle dictée'),
@@ -868,10 +915,11 @@ function App() {
                   ce('div',{className:'col f1',style:{gap:2}},
                     ce('span',{style:{fontWeight:700,fontSize:'.85rem'}},d.titre),
                     ce('span',{className:'xt gt'},d.date+' · '+d.periode+' · '+d.difficulte+' · '+nb+'/'+eleves.length+' corr.'),
-              d.texte&&ce('span',{className:'xt gt',style:{fontStyle:'italic',marginTop:2}},d.texte.length>60?d.texte.slice(0,60)+'…':d.texte)
+                    d.texte&&ce('span',{className:'xt gt',style:{fontStyle:'italic',marginTop:2}},d.texte.length>60?d.texte.slice(0,60)+'…':d.texte)
                   ),
-                  ce('div',{className:'row'},
+                  ce('div',{className:'row',style:{gap:4}},
                     rec.length>0&&ce('button',{className:'btn bg bsm',onClick:()=>st2exp(open?null:d.id)},open?'▲':'🔥 '+rec.length),
+                    ce('button',{className:'btn bo bsm',onClick:()=>openEdit(d)},'✏️'),
                     ce('button',{className:'btn br bsm',onClick:()=>{
                       if (!window.confirm('Supprimer cette dictée et ses analyses ?')) return;
                       sd(p=>p.filter(x=>x.id!==d.id)); sa(p=>p.filter(x=>x.dicteeId!==d.id));
@@ -882,10 +930,10 @@ function App() {
                 open&&rec.length>0&&ce('div',{className:'mt10'},
                   ce('div',{className:'xt gt mb8',style:{fontWeight:700}},'🔥 Fautes récurrentes (≥ 2 élèves)'),
                   ...rec.map(r=>ce('div',{key:r.mot+r.code,className:'rerr'},
-                    Bdg(r.code),
+                    ce('span',{className:'chip',style:{background:CC[r.code].b,color:CC[r.code].c,marginRight:3}},r.code),
                     ce('span',{style:{fontWeight:600,flex:1,fontSize:'.81rem'}},r.mot),
                     ce('span',{className:'xt gt mn',style:{marginRight:8,flexShrink:0}},r.count+'/'+nb),
-                    HBar(r.count,nb,CC[r.code].c)
+                    ce('div',{className:'hbar-wrap'},ce('div',{className:'hbar-fill',style:{width:(r.count/nb*100)+'%',background:CC[r.code].c}}))
                   ))
                 )
               );
