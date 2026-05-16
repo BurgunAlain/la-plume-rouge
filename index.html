@@ -446,8 +446,33 @@ function DonutChart(props) {
    APP
 ══════════════════════════════════════════════════════════════ */
 
+function mdToHtml(md) {
+  if (!md) return '';
+  const lines=md.split('\n');
+  let html='', inList=false;
+  lines.forEach(function(line){
+    const l=line.trim();
+    if (!l){ if(inList){html+='</ul>';inList=false;} html+='<br>'; return; }
+    if (l.startsWith('#### ')){ html+='<h4>'+fmt(l.slice(5))+'</h4>'; return; }
+    if (l.startsWith('### ')){ html+='<h3>'+fmt(l.slice(4))+'</h3>'; return; }
+    if (l.startsWith('## ')){ html+='<h2>'+fmt(l.slice(3))+'</h2>'; return; }
+    if (l.startsWith('# ')){ html+='<h1>'+fmt(l.slice(2))+'</h1>'; return; }
+    if (l.startsWith('---')){ html+='<hr>'; return; }
+    const liM=l.match(/^[-*] (.+)/)||l.match(/^\d+\. (.+)/);
+    if (liM){ if(!inList){html+='<ul>';inList=true;} html+='<li>'+fmt(liM[1])+'</li>'; return; }
+    if (inList){html+='</ul>';inList=false;}
+    html+='<p>'+fmt(l)+'</p>';
+  });
+  if (inList) html+='</ul>';
+  return html;
+}
+function fmt(s){
+  return s
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>');
+}
 function mdToPlainHtml(md) {
-  /* For print - clean formatted HTML */
   return '<div class="ex-content">'+mdToHtml(md)+'</div>';
 }
 
