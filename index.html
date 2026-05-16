@@ -557,6 +557,7 @@ function App() {
   const [exResult,  setExResult]  =useState('');
   const [exLoading, setExLoading] =useState(false);
   const [exFormat,  setExFormat]  =useState('');
+  const [exAbort,   setExAbort]   =useState(null);
   const [groups,   setGroups]  =useState({});
   const [moveMenu, setMoveMenu]=useState(null);
 
@@ -1583,17 +1584,18 @@ function App() {
     const generer = async () => {
       const bloc=buildBloc();
       if (!bloc){ msg('Sélectionnez d\'abord une dictée dans ④ Stats → Groupes exercices','err'); return; }
-      const {key,url,vm:vmModel}=getAIConf();
+      const {key,url}=getAIConf();
       const tm=(AI_PROV[cfg.provider||'mistral']||AI_PROV.mistral).tm;
       if (!key){ msg('Clé API manquante — onglet ⑦','err'); return; }
+      const controller=new AbortController();
+      setExAbort(controller);
       setExLoading(true); setExResult(''); setExFormat('');
       try {
-        const sysPrompt=PROMPT_EXERCICES;
         const userMsg='Voici les données de la classe :\n\n'+bloc+'\n\nGénère les exercices selon ces paramètres.';
-        const resp=await fetch(url,{method:'POST',
+        const resp=await fetch(url,{method:'POST',signal:controller.signal,
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
           body:JSON.stringify({model:tm,max_tokens:4000,messages:[
-            {role:'system',content:sysPrompt},
+            {role:'system',content:PROMPT_EXERCICES},
             {role:'user',content:userMsg}
           ]})
         });
@@ -1602,8 +1604,16 @@ function App() {
         const txt=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
         setExResult(txt);
         msg('✅ Exercices générés — choisissez un format d\'export');
-      } catch(ex){ msg('Erreur : '+ex.message,'err'); }
-      finally { setExLoading(false); }
+      } catch(ex){
+        if (ex.name==='AbortError') msg('Génération annulée','inf');
+        else msg('Erreur : '+ex.message,'err');
+      } finally {
+        setExLoading(false); setExAbort(null);
+      }
+    };
+
+    const stopGen = () => {
+      if (exAbort) { exAbort.abort(); }
     };
 
     const copyBloc = () => {
@@ -1658,26 +1668,26 @@ function App() {
       if (!exResult){ msg('Générez d\'abord les exercices','err'); return; }
       const d2=dictees.find(x=>x.id===exDictee);
       const titre2=d2?d2.titre+' — '+d2.periode:'Exercices';
-      const html='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>'+titre2+'</title><style>'+
-        'body{font-family:Calibri,Arial,sans-serif;font-size:11pt;margin:2cm;color:#1A1A2E;}'+
-        'h1{font-size:14pt;color:#1A3C6E;border-bottom:2px solid #1A3C6E;padding-bottom:6px;margin-bottom:16px;}'+
-        'h2{font-size:12pt;color:#1A3C6E;margin:20px 0 8px;padding:4px 8px;background:#E6EDF7;border-radius:4px;}'+
+      const css=
+        '*{box-sizing:border-box;margin:0;padding:0;}'+
+        'body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#1A1A2E;background:white;}'+
+        'h1{font-size:14pt;color:#1A3C6E;border-bottom:2px solid #1A3C6E;padding-bottom:6px;margin:0 0 16px;}'+
+        'h2{font-size:12pt;color:#1A3C6E;margin:20px 0 8px;padding:4px 8px;background:#E6EDF7;}'+
         'h3,h4{font-size:11pt;color:#2A5298;margin:14px 0 6px;}'+
         'p{margin:6px 0;line-height:1.6;}'+
         'ul{margin:6px 0 6px 20px;}li{margin:4px 0;line-height:1.6;}'+
         'hr{border:none;border-top:1px solid #DDD8CE;margin:16px 0;}'+
         'strong{font-weight:700;}em{font-style:italic;}'+
+        '.wrap{padding:2cm;}'+
         '.footer{margin-top:40px;font-size:8pt;color:#9CA3AF;text-align:center;border-top:1px solid #eee;padding-top:8px;}'+
-        '@media print{@page{margin:2cm}body{margin:0}}'+
-        '</style></head><body>'+
-        '<h1>'+titre2+'</h1>'+
-        mdToHtml(exResult)+
-        '<div class="footer">La Plume Rouge &middot; Alain Burgun &middot; &Eacute;cole Vauban Luxembourg (AEFE)</div>'+
-        '<script>window.onload=function(){window.print();}<\/script>'+
-        '</body></html>';
-      const w=window.open('','_blank','width=800,height=600');
-      if(w){ w.document.write(html); w.document.close(); }
-      else msg('Autorisez les popups pour imprimer','err');
+        '@media print{@page{margin:0}body{padding:0}.wrap{padding:1.5cm}}';
+      const body='<div class="wrap"><h1>'+titre2+'</h1>'+mdToHtml(exResult)+'<div class="footer">La Plume Rouge &middot; Alain Burgun &middot; &Eacute;cole Vauban Luxembourg (AEFE)</div></div>';
+      const html='<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>'+titre2+'</title><style>'+css+'</style></head><body>'+body+'<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script></body></html>';
+      const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const w=window.open(url,'_blank');
+      if(!w) msg('Autorisez les popups pour imprimer','err');
+      else setTimeout(()=>URL.revokeObjectURL(url),60000);
     };
 
     const hasGroups=Object.keys(exGroups).length>0;
@@ -1759,9 +1769,12 @@ function App() {
         ce('div',{className:'ch'},'③ Génération'),
         ce('div',{className:'row',style:{flexWrap:'wrap',gap:8}},
           hasKey
-            ?ce('button',{className:'btn bp',onClick:generer,disabled:exLoading},
-                exLoading?ce('span',{className:'spin'}):'⚡',
-                exLoading?' Génération en cours…':' Générer avec mon IA')
+            ?ce('div',{className:'row',style:{gap:8}},
+                ce('button',{className:'btn bp',onClick:generer,disabled:exLoading},
+                  exLoading?ce('span',{className:'spin'}):'⚡',
+                  exLoading?' Génération en cours…':' Générer avec mon IA'),
+                exLoading&&ce('button',{className:'btn br',onClick:stopGen},'⏹ Arrêter')
+              )
             :ce('div',{className:'col',style:{gap:6}},
                 ce('div',{className:'infob infob-y'},'Pas de clé API configurée — copiez le prompt + données et collez dans votre IA préférée.'),
                 ce('button',{className:'btn bp',onClick:copyBloc},'📋 Copier prompt + données')
