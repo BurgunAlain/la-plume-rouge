@@ -1271,156 +1271,151 @@ function App() {
     /* ── S4 : Groupes pour exercices ── */
     function S4() {
 
-      /* Build a flat list: for each eleve, which (type,col) pairs they belong to */
-      const getEleveGroups = (eleveId) => {
-        const res=[];
-        Object.entries(groups).forEach(([key,g])=>{
-          if (g.remed.some(e=>e.eleveId===eleveId)) res.push({key,col:'remed'});
-          if (g.appro.some(e=>e.eleveId===eleveId)) res.push({key,col:'appro'});
-        });
-        return res;
+      /* ── Get error count for an eleve on a specific type for current dictee ── */
+      const getErrCount = (eleveId, typeKey) => {
+        const a=analyses.find(x=>x.eleveId===eleveId&&x.dicteeId===selDict4);
+        if (!a) return 0;
+        return (a.erreurs||[]).filter(e=>e.code===typeKey).length;
       };
 
-      /* Move eleve within same type rem<->appro */
-      const toggleCol = (eleveId, key) => {
-        setGroups(prev=>{
-          const next=JSON.parse(JSON.stringify(prev));
-          const g=next[key];
-          if (!g) return next;
-          const inRem=g.remed.some(e=>e.eleveId===eleveId);
-          const el=eleves.find(e=>e.id===eleveId);
-          if (!el) return next;
-          const entry={eleveId,nom:el.nom,profiles:el.profiles||[]};
-          if (inRem){
-            g.remed=g.remed.filter(e=>e.eleveId!==eleveId);
-            if (!g.appro.some(e=>e.eleveId===eleveId)) g.appro.push(entry);
-          } else {
-            g.appro=g.appro.filter(e=>e.eleveId!==eleveId);
-            if (!g.remed.some(e=>e.eleveId===eleveId)) g.remed.push(entry);
-          }
-          return next;
-        });
-      };
-
-      /* Move eleve to different type */
-      const moveToType = (eleveId, fromKey, fromCol, toType, toCol) => {
+      /* ── Toggle: click on a cell adds or removes the eleve ── */
+      const toggleCell = (eleveId, typeKey, col) => {
         const el=eleves.find(e=>e.id===eleveId); if (!el) return;
         const entry={eleveId,nom:el.nom,profiles:el.profiles||[]};
         setGroups(prev=>{
           const next=JSON.parse(JSON.stringify(prev));
-          /* remove from source */
-          if (next[fromKey]){
-            next[fromKey][fromCol]=next[fromKey][fromCol].filter(e=>e.eleveId!==eleveId);
-            if (!next[fromKey].remed.length&&!next[fromKey].appro.length) delete next[fromKey];
-          }
-          /* find or create target group that contains toType */
-          const existKey=Object.keys(next).find(k=>k.split('+').includes(toType));
-          if (existKey){
-            if (!next[existKey][toCol].some(e=>e.eleveId===eleveId))
-              next[existKey][toCol].push(entry);
+          /* find group containing this type */
+          const gKey=Object.keys(next).find(k=>k.split('+').includes(typeKey));
+          if (gKey){
+            const inCell=next[gKey][col].some(e=>e.eleveId===eleveId);
+            if (inCell){
+              /* Remove */
+              next[gKey][col]=next[gKey][col].filter(e=>e.eleveId!==eleveId);
+              /* Clean empty groups */
+              if (!next[gKey].remed.length&&!next[gKey].appro.length) delete next[gKey];
+            } else {
+              /* Add */
+              next[gKey][col].push(entry);
+            }
           } else {
-            /* create new single-type group using toType+toType as placeholder key, but display as single */
-            const newKey=toType+'+'+toType;
-            if (!next[newKey]) next[newKey]={types:[toType],remed:[],appro:[]};
-            next[newKey][toCol].push(entry);
+            /* Create new group for this type — pair with most common type */
+            const paired=CK.find(k=>k!==typeKey)||'L';
+            const newKey=[typeKey,paired].sort().join('+');
+            if (!next[newKey]) next[newKey]={types:[typeKey,paired].sort(),remed:[],appro:[]};
+            next[newKey][col].push(entry);
           }
           return next;
         });
-        setMoveMenu(null);
       };
 
-      /* Build table: rows = eleves, cols = S,H,L,A,P x Rem/Appro */
-      /* Each cell shows if this eleve is in that type+col */
-      const allEleves = eleves.filter(el=>{
-        return Object.values(groups).some(g=>
-          g.remed.some(e=>e.eleveId===el.id)||g.appro.some(e=>e.eleveId===el.id)
-        );
-      });
+      /* ── Check if eleve is in a cell ── */
+      const inCell = (eleveId, typeKey, col) => {
+        const gKey=Object.keys(groups).find(k=>k.split('+').includes(typeKey));
+        if (!gKey) return false;
+        return groups[gKey][col].some(e=>e.eleveId===eleveId);
+      };
 
-      const getCellInfo = (eleveId, typeKey, col) => {
-        const grp=Object.entries(groups).find(([k,g])=>k.split('+').includes(typeKey));
-        if (!grp) return null;
-        const [key,g]=grp;
-        const inCol=g[col].some(e=>e.eleveId===eleveId);
-        return inCol?{key,col}:null;
+      /* All eleves sorted by name */
+      const allEleves=[...eleves].sort((a,b)=>a.nom.localeCompare(b.nom));
+
+      /* Error badge */
+      const ErrBadge = (eleveId, typeKey) => {
+        const n=getErrCount(eleveId,typeKey);
+        if (!n) return null;
+        return ce('span',{style:{
+          display:'inline-flex',alignItems:'center',justifyContent:'center',
+          width:18,height:18,borderRadius:'50%',fontSize:'.65rem',fontWeight:700,
+          background:CC[typeKey].c,color:'white',marginLeft:4,flexShrink:0
+        }},n);
       };
 
       return ce('div',null,
         ce('div',{className:'card'},
           ce('div',{className:'ch'},'🎯 Groupes pour exercices'),
-          ce('div',{className:'infob infob-b mb10'},'Cliquez sur un nom pour le déplacer. Rem. = remédiation · Appro. = approfondissement.'),
+          ce('div',{className:'infob infob-b mb10'},'Cliquez dans une case pour ajouter ✚ ou supprimer ✓ un élève. Le rond coloré indique le nombre d\'erreurs de ce type dans la dictée.'),
           ce('div',{className:'roww mb10',style:{gap:8}},
             ce('select',{className:'inp sel f1',defaultValue:selDict4,
               onChange:ev=>{ const v=ev.target.value; setSelDict4(v); setGroups(computeGroups(v,eleves,analyses)); }},
               ce('option',{value:''},'— Choisir une dictée —'),
               ...dictees.map(d=>ce('option',{key:d.id,value:d.id},d.titre+' · '+d.date))
             ),
-            selDict4&&Object.keys(groups).length>0&&ce('button',{className:'btn bp bsm',onClick:exportBloc},'📋 Copier pour l\'agent IA')
+            selDict4&&ce('button',{className:'btn bp bsm',onClick:exportBloc},'📋 Copier pour l\'agent IA')
           ),
+          !selDict4&&ce('div',{className:'infob infob-y'},'Sélectionnez une dictée pour voir les groupes.'),
           selDict4&&Object.keys(groups).length===0&&ce('div',{className:'col',style:{gap:8}},
             ce('div',{className:'infob infob-y'},'Aucune analyse trouvée pour cette dictée.'),
             ce('button',{className:'btn bg bsm',onClick:()=>setGroups(computeGroups(selDict4,eleves,analyses))},'🔄 Recalculer')
           ),
-          /* ── The table ── */
           selDict4&&Object.keys(groups).length>0&&ce('div',{className:'tw'},
-            ce('table',{className:'rt',style:{fontSize:'.78rem'}},
+            ce('table',{className:'rt',style:{fontSize:'.77rem'}},
               ce('thead',null,
                 ce('tr',null,
-                  ce('th',{style:{textAlign:'left',minWidth:110}},'Élève'),
-                  ...CK.map(k=>ce('th',{key:k,colSpan:2,style:{background:CC[k].b,color:CC[k].c,textAlign:'center',fontSize:'.75rem'}},CC[k].l+' ('+k+')'))
+                  ce('th',{style:{textAlign:'left',minWidth:100}},'Élève'),
+                  ...CK.map(k=>ce('th',{key:k,colSpan:2,style:{background:CC[k].b,color:CC[k].c,textAlign:'center',fontSize:'.74rem'}},
+                    CC[k].l+' ('+k+')'
+                  ))
                 ),
                 ce('tr',{style:{background:'var(--cream)'}},
                   ce('th',null),
                   ...CK.flatMap(k=>[
-                    ce('th',{key:k+'r',style:{fontSize:'.68rem',fontWeight:600,color:'#92400E',background:'#FEF3C7',textAlign:'center',padding:'3px 4px'}},'Rem.'),
-                    ce('th',{key:k+'a',style:{fontSize:'.68rem',fontWeight:600,color:'#065F46',background:'#D1FAE5',textAlign:'center',padding:'3px 4px'}},'Appro.')
+                    ce('th',{key:k+'r',style:{fontSize:'.67rem',fontWeight:600,color:'#92400E',background:'#FEF3C7',textAlign:'center',padding:'3px 4px'}},'Rem.'),
+                    ce('th',{key:k+'a',style:{fontSize:'.67rem',fontWeight:600,color:'#065F46',background:'#D1FAE5',textAlign:'center',padding:'3px 4px'}},'Appro.')
                   ])
                 )
               ),
               ce('tbody',null,
                 allEleves.map(el=>ce('tr',{key:el.id},
-                  ce('td',{style:{fontWeight:600,fontSize:'.80rem',whiteSpace:'nowrap'}},
+                  ce('td',{style:{fontWeight:600,fontSize:'.79rem',whiteSpace:'nowrap',padding:'5px 8px'}},
                     el.nom.split(' ')[0],
-                    (el.profiles||[]).length>0&&ce('span',{style:{fontSize:'.62rem',color:'var(--gray)',marginLeft:3}},
+                    (el.profiles||[]).length>0&&ce('span',{className:'xt gt',style:{marginLeft:3}},
                       '('+pLabel((el.profiles||[])[0]).slice(0,3)+')'
                     )
                   ),
                   ...CK.flatMap(k=>{
-                    const remInfo=getCellInfo(el.id,k,'remed');
-                    const aproInfo=getCellInfo(el.id,k,'appro');
+                    const isRem = inCell(el.id,k,'remed');
+                    const isAppro = inCell(el.id,k,'appro');
+                    const errN = getErrCount(el.id,k);
                     return [
-                      ce('td',{key:k+'r',style:{textAlign:'center',background:remInfo?'#FEF3C7':'white',padding:'4px 3px',cursor:remInfo?'pointer':'default'},
-                        onClick:()=>{ if(remInfo){ if(moveMenu&&moveMenu.eleveId===el.id&&moveMenu.key===remInfo.key&&moveMenu.col==='remed') setMoveMenu(null); else setMoveMenu({eleveId:el.id,key:remInfo.key,col:'remed'}); } }},
-                        remInfo?ce('span',{style:{fontSize:'.75rem',fontWeight:600,color:'#92400E',textDecoration:'underline dotted',cursor:'pointer'}},'✓'):null
+                      /* Rem cell */
+                      ce('td',{key:k+'r',
+                        style:{
+                          textAlign:'center',
+                          background:isRem?'#FEF3C7':errN>0?'#FFFBF0':'white',
+                          padding:'4px 3px',cursor:'pointer',
+                          transition:'background .12s',
+                          borderLeft:'1px solid var(--bdr)'
+                        },
+                        title:isRem?'Cliquer pour retirer du groupe Rem.':'Cliquer pour ajouter en Rem.',
+                        onClick:()=>toggleCell(el.id,k,'remed')
+                      },
+                        ce('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',gap:2}},
+                          isRem
+                            ?ce('span',{style:{color:'#92400E',fontWeight:700,fontSize:'.8rem'}},'✓')
+                            :ce('span',{style:{color:'#D1D5DB',fontSize:'.75rem'}},'+'),
+                          errN>0?ErrBadge(el.id,k):null
+                        )
                       ),
-                      ce('td',{key:k+'a',style:{textAlign:'center',background:aproInfo?'#D1FAE5':'white',padding:'4px 3px',cursor:aproInfo?'pointer':'default'},
-                        onClick:()=>{ if(aproInfo){ if(moveMenu&&moveMenu.eleveId===el.id&&moveMenu.key===aproInfo.key&&moveMenu.col==='appro') setMoveMenu(null); else setMoveMenu({eleveId:el.id,key:aproInfo.key,col:'appro'}); } }},
-                        aproInfo?ce('span',{style:{fontSize:'.75rem',fontWeight:600,color:'#065F46',textDecoration:'underline dotted',cursor:'pointer'}},'✓'):null
+                      /* Appro cell */
+                      ce('td',{key:k+'a',
+                        style:{
+                          textAlign:'center',
+                          background:isAppro?'#D1FAE5':'white',
+                          padding:'4px 3px',cursor:'pointer',
+                          transition:'background .12s'
+                        },
+                        title:isAppro?'Cliquer pour retirer du groupe Appro.':'Cliquer pour ajouter en Appro.',
+                        onClick:()=>toggleCell(el.id,k,'appro')
+                      },
+                        ce('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',gap:2}},
+                          isAppro
+                            ?ce('span',{style:{color:'#065F46',fontWeight:700,fontSize:'.8rem'}},'✓')
+                            :ce('span',{style:{color:'#D1D5DB',fontSize:'.75rem'}},'+')
+                        )
                       )
                     ];
                   })
                 ))
               )
-            )
-          ),
-          /* ── Move menu popup ── */
-          moveMenu&&ce('div',{style:{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'white',border:'2px solid var(--bdr)',borderRadius:13,padding:16,zIndex:200,boxShadow:'0 8px 32px rgba(0,0,0,.18)',minWidth:260}},
-            ce('div',{className:'ch mb8'},
-              '↕ Déplacer ',
-              ce('strong',null,(eleves.find(e=>e.id===moveMenu.eleveId)||{}).nom||'')
-            ),
-            ce('div',{className:'col',style:{gap:5}},
-              ...CK.flatMap(k=>[
-                ce('button',{key:k+'r',className:'btn bg bsm',style:{justifyContent:'flex-start',gap:8},
-                  onClick:()=>moveToType(moveMenu.eleveId,moveMenu.key,moveMenu.col,k,'remed')},
-                  ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c}},k),
-                  'Remédiation'),
-                ce('button',{key:k+'a',className:'btn bg bsm',style:{justifyContent:'flex-start',gap:8},
-                  onClick:()=>moveToType(moveMenu.eleveId,moveMenu.key,moveMenu.col,k,'appro')},
-                  ce('span',{className:'chip',style:{background:CC[k].b,color:CC[k].c}},k),
-                  'Approfondissement')
-              ]),
-              ce('button',{className:'btn br bsm mt8',onClick:()=>setMoveMenu(null)},'✕ Annuler')
             )
           )
         )
