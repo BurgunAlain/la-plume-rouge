@@ -853,6 +853,7 @@ function App() {
               ['Facile','Moyen','Difficile'].map(d=>ce('option',{key:d,value:d},d))
             )
           ),
+          ce('textarea',{className:'inp',style:{minHeight:90},placeholder:'Texte intégral de la dictée (optionnel mais recommandé)…',defaultValue:'',onChange:ev=>st2txt(ev.target.value)}),
           ce('button',{className:'btn bp',style:{alignSelf:'flex-start'},onClick:add},'+ Ajouter')
         )
       ),
