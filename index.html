@@ -450,23 +450,31 @@ function computeGroups(dicteeId, elevesArr, analysesArr) {
     if (!dicteeId) return {};
     const anals=analysesArr.filter(a=>a.dicteeId===dicteeId);
     if (!anals.length) return {};
+    /* Structure: grps[typeKey] = {remed:[], appro:[]} */
     const grps={};
+    CK.forEach(k=>{ grps[k]={remed:[],appro:[]}; });
     elevesArr.forEach(el=>{
       const anal=anals.find(a=>a.eleveId===el.id);
+      const entry={eleveId:el.id,nom:el.nom,profiles:el.profiles||[]};
       let top2;
       if (!anal||!(anal.erreurs||[]).length){
+        /* No errors: approfondissement on 2 random types */
         top2=['S','A'];
+        top2.forEach(k=>grps[k].appro.push(entry));
       } else {
         const c=cnt(anal.erreurs||[]);
         const sorted=CK.slice().sort((a,b)=>c[b]-c[a]);
-        top2=sorted.slice(0,2).filter(k=>c[k]>0);
-        if (top2.length<2) top2=[top2[0]||'S',sorted[2]||'A'];
+        /* Top 2 types with errors */
+        top2=sorted.filter(k=>c[k]>0).slice(0,2);
+        /* If only 1 type has errors, pick the next type as second */
+        if (top2.length===0) top2=['S','A'];
+        else if (top2.length===1) top2=[top2[0],sorted.find(k=>k!==top2[0])||'A'];
+        top2.forEach(k=>grps[k].remed.push(entry));
       }
-      const key=top2.sort().join('+');
-      const isZero=!anal||!(anal.erreurs||[]).length;
-      if (!grps[key]) grps[key]={types:top2.sort(),remed:[],appro:[]};
-      if (isZero) grps[key].appro.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
-      else grps[key].remed.push({eleveId:el.id,nom:el.nom,profiles:el.profiles||[]});
+    });
+    /* Remove empty types */
+    CK.forEach(k=>{
+      if (!grps[k].remed.length&&!grps[k].appro.length) delete grps[k];
     });
     return grps;
   }
@@ -1040,15 +1048,16 @@ function App() {
       bloc += '- Longueur : [nb d\'items]\n';
       bloc += '- Correction : [même feuille / page séparée / HTML uniquement]\n\n';
       bloc += 'GROUPES :\n';
-      Object.entries(groups).forEach(([key,g])=>{
+      CK.forEach(k=>{
+        const g=groups[k]; if (!g) return;
         if (g.remed.length>0){
-          bloc += '\nGROUPE '+key+' — REMÉDIATION ('+g.remed.length+' élève(s))\n';
+          bloc += '\nTYPE '+k+' ('+CC[k].l+') — REMÉDIATION ('+g.remed.length+' élève(s))\n';
           bloc += 'Élèves : '+g.remed.map(e=>e.nom).join(', ')+'\n';
           const profs=g.remed.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
           bloc += 'Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
         }
         if (g.appro.length>0){
-          bloc += '\nGROUPE '+key+' — APPROFONDISSEMENT ('+g.appro.length+' élève(s))\n';
+          bloc += '\nTYPE '+k+' ('+CC[k].l+') — APPROFONDISSEMENT ('+g.appro.length+' élève(s))\n';
           bloc += 'Élèves : '+g.appro.map(e=>e.nom).join(', ')+'\n';
           const profs=g.appro.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
           bloc += 'Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
@@ -1310,9 +1319,8 @@ function App() {
 
       /* ── Check if eleve is in a cell ── */
       const inCell = (eleveId, typeKey, col) => {
-        const gKey=Object.keys(groups).find(k=>k.split('+').includes(typeKey));
-        if (!gKey) return false;
-        return groups[gKey][col].some(e=>e.eleveId===eleveId);
+        if (!groups[typeKey]) return false;
+        return groups[typeKey][col].some(e=>e.eleveId===eleveId);
       };
 
       /* All eleves sorted by name */
@@ -1469,15 +1477,16 @@ function App() {
       bloc+='- Longueur : '+exItems+' items\n';
       bloc+='- Correction : '+(exCorrec==='meme'?'même feuille':'page séparée')+'\n\n';
       bloc+='GROUPES :\n';
-      Object.entries(exGroups).forEach(([key,g])=>{
+      CK.forEach(k=>{
+        const g=exGroups[k]; if (!g) return;
         if (g.remed.length>0){
-          bloc+='\nGROUPE '+key+' — REMÉDIATION ('+g.remed.length+' élève(s))\n';
+          bloc+='\nTYPE '+k+' ('+CC[k].l+') — REMÉDIATION ('+g.remed.length+' élève(s))\n';
           bloc+='Élèves : '+g.remed.map(e=>e.nom).join(', ')+'\n';
           const profs=g.remed.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
           bloc+='Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
         }
         if (g.appro.length>0){
-          bloc+='\nGROUPE '+key+' — APPROFONDISSEMENT ('+g.appro.length+' élève(s))\n';
+          bloc+='\nTYPE '+k+' ('+CC[k].l+') — APPROFONDISSEMENT ('+g.appro.length+' élève(s))\n';
           bloc+='Élèves : '+g.appro.map(e=>e.nom).join(', ')+'\n';
           const profs=g.appro.flatMap(e=>(e.profiles||[]).map(p=>e.nom.split(' ')[0]+'('+pLabel(p)+')'));
           bloc+='Profils particuliers : '+(profs.length>0?profs.join(', '):'aucun')+'\n';
